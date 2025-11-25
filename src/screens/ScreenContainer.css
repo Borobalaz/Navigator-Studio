@@ -1,0 +1,32 @@
+.screen-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding-left: 00px;
+  font-family: sans-serif;
+  box-sizing: border-box;
+  background-color: var(--shade-color);
+}
+
+.screen-tab-list {
+  display: flex;
+  height: 50px;
+  flex-direction: row;
+  background-color: var(--bg-color);
+  overflow-x: auto;
+}
+
+.screen-tab-list::-webkit-scrollbar {
+  height: 6px;
+}
+
+.screen-tab-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.screen-container-screen {
+  border-left: 1px solid var(--text-color);
+
+}
