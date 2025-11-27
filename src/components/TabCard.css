@@ -1,21 +1,54 @@
 .tab-card {
   display: flex;
+  align-items: center;
+  justify-content: space-between; /* label left, close on right */
+  padding: 0 8px;
+
   background-color: var(--bg-color);
   border: 1px solid var(--shade-color);
   border-bottom: 1px solid var(--text-color);
+
   width: 100px;
   min-width: 100px;
   height: 100%;
-  align-items: center;
-  justify-content: center;
   box-sizing: border-box;
+
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
+
+  cursor: pointer;
+  user-select: none;
 }
 
 .active-tab-card {
   background-color: var(--shade-color);
   border: 1px solid var(--text-color);
   border-bottom: none;
+}
 
+/* Label styling */
+.tab-card-label {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Close button */
+.tab-card-close{
+  font-size: 14px;
+  line-height: 14px;
+  padding: 2px 4px;
+  color: var(--text-color);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.tab-card-close:hover {
+  opacity: 1;
+  color: var(--text-color);
 }

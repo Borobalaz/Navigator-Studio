@@ -1,11 +1,18 @@
 import "./ViewCardScreenSelector.css"
+import { ProgramLabel, ProgramLabelProps } from "./ProgramLabel";
 
-export function ViewCardScreenSelector() {
+interface ViewCardScreenSelectorProps {
+  programLabelProps: ProgramLabelProps[];
+}
+
+export function ViewCardScreenSelector({ programLabelProps }: ViewCardScreenSelectorProps) {
 
 
   return (
     <div className="view-card-screen-selector">
-      ASD
+      {programLabelProps.map((props, index) => (
+        <ProgramLabel key={index} {...props}/>
+      ))}
     </div>
   );
 }
