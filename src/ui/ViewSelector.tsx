@@ -43,17 +43,6 @@ export function ViewSelector() {
           }
         },
       ]} />
-      <ViewCard key="3" icon={ImportContactsIcon} programLabelProps={[
-        {
-          label: "asd", onClick: () => {
-            tabManager.addTab({
-              label: "asd",
-              component: HomeScreen,
-              props: { text: "asd" }
-            })
-          }
-        },
-      ]} />
       <div className="view-selector-settings">
         <ViewCard key="6" icon={SettingsIcon} programLabelProps={[
           {
