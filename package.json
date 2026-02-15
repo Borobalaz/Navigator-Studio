@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "dist": "electron-builder",
-    "release": "npm run build && npm run dist"
+    "dist": "electron-builder && npm publish --publish always",
+    "release": "npm run build && npm version patch && npm run dist"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
