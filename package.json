@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "dist": "electron-builder --publish always",
-    "release": "npm release.cjs"
+    "release": "node release.cjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
