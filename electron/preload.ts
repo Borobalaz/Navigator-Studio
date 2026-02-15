@@ -40,6 +40,9 @@ contextBridge.exposeInMainWorld("api", {
     }));
   },
 
+  getPublicPath: (...segments: string[]) =>
+    ipcRenderer.invoke("get-public-path", ...segments),
+
   openFolder: async (relativePath: string) => {
     const fullPath = path.resolve(relativePath);
     await ipcRenderer.invoke("open-folder", fullPath);
@@ -57,7 +60,7 @@ contextBridge.exposeInMainWorld("api", {
     await fs.promises.writeFile(filePath, buffer);
     console.log(`File copied to ${filePath}`);
   },
-  
+
   runExe: (exePath: string) => ipcRenderer.invoke("run-executable", exePath),
   onStdout: (callback: (data: string) => void) =>
     ipcRenderer.on("exe-stdout", (_e, data) => callback(data)),

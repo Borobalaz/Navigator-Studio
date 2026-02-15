@@ -120,6 +120,14 @@ ipcMain.handle("open-folder", async (_event, folderPath: string) => {
   await shell.openPath(folderPath);
 });
 
+ipcMain.handle("get-public-path", (_, ...segments: string[]) => {
+  const basePath = app.isPackaged
+    ? path.join(process.resourcesPath, "public")
+    : path.join(process.cwd(), "public");
+
+  return path.join(basePath, ...segments);
+});
+
 autoUpdater.on("checking-for-update", () => {
   win?.webContents.send("update-status", "Checking for updates...");
 });

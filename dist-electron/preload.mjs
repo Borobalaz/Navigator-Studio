@@ -1,10 +1,10 @@
-import { contextBridge as a, ipcRenderer as r } from "electron";
+import { contextBridge as s, ipcRenderer as r } from "electron";
 import l from "fs";
 import i from "path";
-a.exposeInMainWorld("ipcRenderer", {
+s.exposeInMainWorld("ipcRenderer", {
   on(...e) {
     const [o, n] = e;
-    return r.on(o, (t, ...s) => n(t, ...s));
+    return r.on(o, (t, ...a) => n(t, ...a));
   },
   off(...e) {
     const [o, ...n] = e;
@@ -21,7 +21,7 @@ a.exposeInMainWorld("ipcRenderer", {
   // You can expose other APTs you need here.
   // ...
 });
-a.exposeInMainWorld("api", {
+s.exposeInMainWorld("api", {
   readFolder: async (e) => {
     const o = i.resolve(e);
     return console.log("Reading folder:", o), (await l.promises.readdir(o, {
@@ -31,12 +31,13 @@ a.exposeInMainWorld("api", {
       isDirectory: t.isDirectory()
     }));
   },
+  getPublicPath: (...e) => r.invoke("get-public-path", ...e),
   openFolder: async (e) => {
     const o = i.resolve(e);
     await r.invoke("open-folder", o);
   },
   copyFileToFolder: async (e, o) => {
-    const n = i.resolve(e), t = i.join(n, o.name), s = await o.arrayBuffer(), d = Buffer.from(s);
+    const n = i.resolve(e), t = i.join(n, o.name), a = await o.arrayBuffer(), d = Buffer.from(a);
     await l.promises.writeFile(t, d), console.log(`File copied to ${t}`);
   },
   runExe: (e) => r.invoke("run-executable", e),
@@ -47,7 +48,7 @@ a.exposeInMainWorld("api", {
   minimize: () => r.invoke("minimize-window"),
   close: () => r.invoke("close-window")
 });
-a.exposeInMainWorld("updater", {
+s.exposeInMainWorld("updater", {
   onStatus: (e) => r.on("update-status", (o, n) => e(n)),
   onProgress: (e) => r.on("update-progress", (o, n) => e(n)),
   onReady: (e) => r.on("update-ready", () => e())

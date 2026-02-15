@@ -5,10 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && electron-builder",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "release": "node release.cjs"
+    "build": "tsc && vite build",
+    "dist": "electron-builder",
+    "release": "npm run build && npm run dist"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -45,6 +44,24 @@
       "dist-electron/**",
       "package.json"
     ],
+    "extraResources": [
+      {
+        "from": "public",
+        "to": "public",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
     "asar": true,
     "productName": "Navigator Studio",
     "publish": [
