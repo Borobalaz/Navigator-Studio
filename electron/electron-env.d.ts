@@ -26,7 +26,7 @@ interface Window {
   ipcRenderer: import('electron').IpcRenderer
 }
 
-export {};
+export { };
 
 declare global {
   interface Window {
@@ -36,6 +36,11 @@ declare global {
       ) => Promise<
         { name: string; isDirectory: boolean }[]
       >;
+    };
+    updater: {
+      onStatus: (cb: (msg: string) => void) => void;
+      onProgress: (cb: (percent: number) => void) => void;
+      onReady: (cb: () => void) => void;
     };
   }
 }

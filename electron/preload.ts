@@ -70,3 +70,13 @@ contextBridge.exposeInMainWorld("api", {
   close: () => ipcRenderer.invoke("close-window"),
 });
 
+contextBridge.exposeInMainWorld("updater", {
+  onStatus: (cb: (msg: string) => void) =>
+    ipcRenderer.on("update-status", (_, msg: string) => cb(msg)),
+
+  onProgress: (cb: (percent: number) => void) =>
+    ipcRenderer.on("update-progress", (_, percent: number) => cb(percent)),
+
+  onReady: (cb: () => void) =>
+    ipcRenderer.on("update-ready", () => cb()),
+});

@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import iconv from 'iconv-lite'
+import { autoUpdater } from 'electron-updater'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -119,5 +120,28 @@ ipcMain.handle("open-folder", async (event, folderPath: string) => {
   await shell.openPath(folderPath);
 });
 
-app.whenReady().then(createWindow)
+autoUpdater.on("checking-for-update", () => {
+  win?.webContents.send("update-status", "Checking for updates...");
+});
+
+autoUpdater.on("update-available", () => {
+  win?.webContents.send("update-status", "Downloading update...");
+});
+
+autoUpdater.on("download-progress", (progress) => {
+  win?.webContents.send("update-progress", progress.percent);
+});
+
+autoUpdater.on("update-downloaded", () => {
+  win?.webContents.send("update-ready");
+});
+
+autoUpdater.on("error", (err) => {
+  win?.webContents.send("update-error", err.message);
+});
+
+app.whenReady().then(() => {
+  createWindow();
+  autoUpdater.checkForUpdatesAndNotify();
+})
 
