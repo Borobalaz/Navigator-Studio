@@ -1,0 +1,16 @@
+.view-selector {
+  width: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  background: linear-gradient(to right, var(--secondary-color), var(--secondary-color));
+
+  & > div {
+    width: 100%;
+  }
+
+  & .view-selector-settings {
+    margin-top: auto;
+  }
+}

@@ -1,0 +1,34 @@
+.screen-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  font-family: sans-serif;
+  box-sizing: border-box;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.screen-tab-list {
+  font-size: small;
+  display: flex;
+  height: 30px;
+  flex-direction: row;
+  overflow-x: auto;
+}
+
+.screen-tab-list::-webkit-scrollbar {
+  height: 6px;
+}
+
+.screen-tab-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.screen-container-screen {
+  background-color: var(--shade-color);
+  margin-left: 0px;
+  margin-right: 5px;
+  height: 100%;
+}

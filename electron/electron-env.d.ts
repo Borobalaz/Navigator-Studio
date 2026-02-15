@@ -25,3 +25,17 @@ declare namespace NodeJS {
 interface Window {
   ipcRenderer: import('electron').IpcRenderer
 }
+
+export {};
+
+declare global {
+  interface Window {
+    api: {
+      readFolder: (
+        relativePath: string
+      ) => Promise<
+        { name: string; isDirectory: boolean }[]
+      >;
+    };
+  }
+}

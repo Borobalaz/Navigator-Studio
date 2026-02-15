@@ -1,0 +1,25 @@
+.view-card-screen-selector {
+  position: absolute;
+  top: 25%;
+  left: 80%;
+  margin-top: 6px;
+
+  background: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid #444;
+  border-radius: 5px;
+  padding: 2px 2px;
+  min-width: 120px;
+
+  z-index: 9999;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.35);
+
+  /* hidden by default */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  /* fade/slide animation */
+  transform: translateY(-10px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+}

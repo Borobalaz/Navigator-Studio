@@ -1,0 +1,56 @@
+.app-header {
+  display: flex;
+  height: 40px;
+  align-items: center;
+  padding: 0px;
+  justify-content: space-between;
+  background-color: var(--shade-color);
+  color: var(--text-color);
+
+  -webkit-app-region: drag;
+}
+
+.app-header-buttons {
+  display: flex;
+  height: 40px;
+  justify-content: flex-end;
+  align-items: center;
+  -webkit-app-region: no-drag;
+}
+
+.app-header-buttons button {
+  width: 100%;
+  font-size: small;
+  height: 40px;
+  width: 50px;
+  color: var(--text-color);
+  background-color: var(--shade-color);
+  transition: background-color 0.2s ease;
+  box-sizing: border-box;
+  cursor: pointer;
+  outline: none;
+  padding: 0px;
+}
+
+.app-header-buttons button:hover {
+  background-color: var(--text-color-other);
+}
+
+.app-header-buttons #close-button:hover {
+  background-color: #c71313;
+}
+
+.app-header-title {
+  display: flex;
+  font-size: 14px;
+  font-weight: 600;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-color);
+  padding-left: 10px;
+}
+
+.app-header-logo {
+  height: 20px;
+  width: 20px;
+}

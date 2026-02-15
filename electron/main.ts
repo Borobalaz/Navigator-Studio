@@ -1,9 +1,9 @@
-import { app, BrowserWindow, nativeTheme } from 'electron'
-import { createRequire } from 'node:module'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { spawn } from 'node:child_process'
+import iconv from 'iconv-lite'
 
-const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // The built directory structure
@@ -27,19 +27,17 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 let win: BrowserWindow | null
 
 function createWindow() {
-  //process.nextTick(() => {
-  //  nativeTheme.themeSource = "dark";
-  //});
-
   win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC, 'a_logo_2_S.jpg'),
+    icon: path.join(process.env.VITE_PUBLIC!, 'a_logo_2_S.jpg'),
     title: "Navigator Studio",
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false,
     },
-    frame: true,
+    frame: false,
     autoHideMenuBar: false, // ← hides the menu/toolbar
-    backgroundColor: "#1e1e1e",       // ← required for dark mode
   })
 
   // Test active push message to Renderer-process.
@@ -50,7 +48,6 @@ function createWindow() {
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL)
   } else {
-    // win.loadFile('dist/index.html')
     win.loadFile(path.join(RENDERER_DIST, 'index.html'))
   }
 }
@@ -72,5 +69,55 @@ app.on('activate', () => {
     createWindow()
   }
 })
+ipcMain.handle("minimize-window", () => {
+  win?.minimize();
+});
+
+ipcMain.handle("maximize-window", () => {
+  if (win?.isMaximized()) win.unmaximize();
+  else win?.maximize();
+});
+
+ipcMain.handle("close-window", () => {
+  win?.close();
+});
+
+ipcMain.handle("run-executable", (event, exeName: string) => {
+  return new Promise((resolve, reject) => {
+    const exePath = path.join(process.env.APP_ROOT!, exeName);
+    const child = spawn(exePath, [], {
+      windowsHide: true,
+      cwd: path.dirname(exePath),
+    });
+
+    let stdout = "";
+    let stderr = "";
+
+    child.stdout.on("data", (data: Buffer) => {
+      const text = iconv.decode(data, "win1250"); // decode using correct encoding
+      stdout += text;
+      event.sender.send("exe-stdout", text);
+    });
+
+    child.stderr.on("data", (data: Buffer) => {
+      const text = iconv.decode(data, "win1250");
+      stderr += text;
+      event.sender.send("exe-stderr", text);
+    });
+
+    child.on("close", (code) => {
+      if (code === 0) resolve(stdout || "Executed successfully");
+      else reject(stderr || `Process exited with code ${code}`);
+    });
+
+    child.on("error", (err) => reject(err.message));
+  });
+});
+
+ipcMain.handle("open-folder", async (event, folderPath: string) => {
+  const { shell } = await import('electron');
+  await shell.openPath(folderPath);
+});
 
 app.whenReady().then(createWindow)
+

@@ -1,0 +1,12 @@
+.program-label {
+  cursor: pointer;
+  background-color: var(--shade-color);
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-size: 15px;
+  color: var(--text-color);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background-color 0.2s ease; 
+}

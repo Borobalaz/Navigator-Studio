@@ -1,0 +1,155 @@
+.pdf-splitter-screen {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  height: 100%;
+  background-color: var(--shade-color);
+  color: var(--text-color);
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif; /* Ensure Hungarian special characters (Á, Ű, etc.) display correctly */
+}
+
+.pdf-splitter-directories-panel {
+  grid-column: 1 / span 2;
+  grid-row: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 6px;
+  background-color: var(--shade-color);
+  height: 100%;
+  #pdf-splitter-arrow-icon {
+    align-self: center;
+  }
+}
+
+.pdf-splitter-output {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 8px;
+  background-color: var(--bg-color);
+    color: var(--text-color);
+  overflow-y: auto;
+  min-height: 0;
+  max-height: 200px;
+  flex-shrink: 0;
+}
+
+.pdf-splitter-output > p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.pdf-splitter-control-panel {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 8px;
+  background-color: var(--shade-color);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.pdf-splitter-control-panel-selector {
+  display: flex;
+  gap: 5px;
+}
+
+.pdf-splitter-screen select {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: var(--shade-color);
+  color: var(--text-color);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  font-family: inherit;
+}
+
+.pdf-splitter-screen select:hover {
+  border-color: var(--primary-color);
+  background-color: rgba(101, 43, 82, 0.05);
+}
+
+.pdf-splitter-screen select option {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.pdf-drop-zone {
+  flex: 1;
+  min-height: 80px;
+  padding: 20px;
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.02);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdf-drop-zone:hover {
+  border-color: var(--primary-color);
+  background-color: rgba(101, 43, 82, 0.08);
+}
+
+.pdf-drop-zone.dragging {
+  border-color: var(--primary-color);
+  background-color: rgba(101, 43, 82, 0.12);
+  transform: scale(1.01);
+}
+
+.pdf-drop-zone p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-color-other);
+  user-select: none;
+  pointer-events: none;
+}
+
+.pdf-splitter-screen button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  background-color: var(--secondary-color);
+  color: var(--text-color-other);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.pdf-splitter-screen button:hover {
+  background-color: var(--primary-color);
+}
+
+.pdf-splitter-screen button:active {
+  transform: scale(0.97);
+}
