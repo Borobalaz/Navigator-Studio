@@ -40,6 +40,12 @@
   "main": "dist-electron/main.js",
   "build": {
     "appId": "com.navigator.studio",
+    "files": [
+      "dist/**",
+      "dist-electron/**",
+      "package.json"
+    ],
+    "asar": true,
     "productName": "Navigator Studio",
     "publish": [
       {

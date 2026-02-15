@@ -49,7 +49,7 @@ function createWindow() {
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL)
   } else {
-    win.loadFile(path.join(RENDERER_DIST, 'index.html'))
+    win.loadFile(path.join(__dirname, "../dist/index.html"));
   }
 }
 
@@ -115,7 +115,7 @@ ipcMain.handle("run-executable", (event, exeName: string) => {
   });
 });
 
-ipcMain.handle("open-folder", async (event, folderPath: string) => {
+ipcMain.handle("open-folder", async (_event, folderPath: string) => {
   const { shell } = await import('electron');
   await shell.openPath(folderPath);
 });

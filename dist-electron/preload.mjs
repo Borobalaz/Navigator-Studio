@@ -1,60 +1,54 @@
-import { contextBridge, ipcRenderer } from "electron";
-import fs from "fs";
-import path from "path";
-contextBridge.exposeInMainWorld("ipcRenderer", {
-  on(...args) {
-    const [channel, listener] = args;
-    return ipcRenderer.on(channel, (event, ...args2) => listener(event, ...args2));
+import { contextBridge as a, ipcRenderer as r } from "electron";
+import l from "fs";
+import i from "path";
+a.exposeInMainWorld("ipcRenderer", {
+  on(...e) {
+    const [o, n] = e;
+    return r.on(o, (t, ...s) => n(t, ...s));
   },
-  off(...args) {
-    const [channel, ...omit] = args;
-    return ipcRenderer.off(channel, ...omit);
+  off(...e) {
+    const [o, ...n] = e;
+    return r.off(o, ...n);
   },
-  send(...args) {
-    const [channel, ...omit] = args;
-    return ipcRenderer.send(channel, ...omit);
+  send(...e) {
+    const [o, ...n] = e;
+    return r.send(o, ...n);
   },
-  invoke(...args) {
-    const [channel, ...omit] = args;
-    return ipcRenderer.invoke(channel, ...omit);
+  invoke(...e) {
+    const [o, ...n] = e;
+    return r.invoke(o, ...n);
   }
   // You can expose other APTs you need here.
   // ...
 });
-contextBridge.exposeInMainWorld("api", {
-  readFolder: async (relativePath) => {
-    const fullPath = path.resolve(relativePath);
-    console.log("Reading folder:", fullPath);
-    const dirents = await fs.promises.readdir(fullPath, {
-      withFileTypes: true
-    });
-    return dirents.map((d) => ({
-      name: d.name,
-      isDirectory: d.isDirectory()
+a.exposeInMainWorld("api", {
+  readFolder: async (e) => {
+    const o = i.resolve(e);
+    return console.log("Reading folder:", o), (await l.promises.readdir(o, {
+      withFileTypes: !0
+    })).map((t) => ({
+      name: t.name,
+      isDirectory: t.isDirectory()
     }));
   },
-  openFolder: async (relativePath) => {
-    const fullPath = path.resolve(relativePath);
-    await ipcRenderer.invoke("open-folder", fullPath);
+  openFolder: async (e) => {
+    const o = i.resolve(e);
+    await r.invoke("open-folder", o);
   },
-  copyFileToFolder: async (folderPath, file) => {
-    const fullFolderPath = path.resolve(folderPath);
-    const filePath = path.join(fullFolderPath, file.name);
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    await fs.promises.writeFile(filePath, buffer);
-    console.log(`File copied to ${filePath}`);
+  copyFileToFolder: async (e, o) => {
+    const n = i.resolve(e), t = i.join(n, o.name), s = await o.arrayBuffer(), d = Buffer.from(s);
+    await l.promises.writeFile(t, d), console.log(`File copied to ${t}`);
   },
-  runExe: (exePath) => ipcRenderer.invoke("run-executable", exePath),
-  onStdout: (callback) => ipcRenderer.on("exe-stdout", (_e, data) => callback(data)),
-  onStderr: (callback) => ipcRenderer.on("exe-stderr", (_e, data) => callback(data)),
-  removeListener: (channel, callback) => ipcRenderer.removeListener(channel, callback),
-  maximize: () => ipcRenderer.invoke("maximize-window"),
-  minimize: () => ipcRenderer.invoke("minimize-window"),
-  close: () => ipcRenderer.invoke("close-window")
+  runExe: (e) => r.invoke("run-executable", e),
+  onStdout: (e) => r.on("exe-stdout", (o, n) => e(n)),
+  onStderr: (e) => r.on("exe-stderr", (o, n) => e(n)),
+  removeListener: (e, o) => r.removeListener(e, o),
+  maximize: () => r.invoke("maximize-window"),
+  minimize: () => r.invoke("minimize-window"),
+  close: () => r.invoke("close-window")
 });
-contextBridge.exposeInMainWorld("updater", {
-  onStatus: (cb) => ipcRenderer.on("update-status", (_, msg) => cb(msg)),
-  onProgress: (cb) => ipcRenderer.on("update-progress", (_, percent) => cb(percent)),
-  onReady: (cb) => ipcRenderer.on("update-ready", () => cb())
+a.exposeInMainWorld("updater", {
+  onStatus: (e) => r.on("update-status", (o, n) => e(n)),
+  onProgress: (e) => r.on("update-progress", (o, n) => e(n)),
+  onReady: (e) => r.on("update-ready", () => e())
 });
