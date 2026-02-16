@@ -43,7 +43,7 @@ export function PDFSplitterScreen() {
             <option value="JAR">Járulék</option>
           </select>
         </div>
-        <button onClick={() => window.api.runExe(folderPath ? `${folderPath}/pdf_szetszedo/pdf_szetszedo_${selectedTemplate[0]}.exe` : "")}>PDF vágása</button>
+        <button onClick={() => window.api.runExe(folderPath ? `${folderPath}/pdf_szetszedo_${selectedTemplate[0]}.exe` : "")}>PDF vágása</button>
       </div>
     </div>
   );
