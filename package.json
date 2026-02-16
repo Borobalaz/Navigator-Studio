@@ -38,9 +38,6 @@
   },
   "main": "dist-electron/main.js",
   "build": {
-    "nsis": {
-      "useZip": true
-    },
     "directories": {
       "output": "dist"
     },
