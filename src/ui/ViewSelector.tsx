@@ -34,11 +34,11 @@ export function ViewSelector() {
       ]} />
       <ViewCard key="2" icon={ImportContactsIcon} programLabelProps={[
         {
-          label: "asd2", onClick: () => {
+          label: "Teendők", onClick: () => {
             tabManager.addTab({
-              label: "asd2",
+              label: "Teendők",
               component: HomeScreen,
-              props: { text: "asd2" }
+              props: { text: "Teendők" }
             })
           }
         },
