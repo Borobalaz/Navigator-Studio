@@ -83,9 +83,17 @@ ipcMain.handle("close-window", () => {
   win?.close();
 });
 
-ipcMain.handle("run-executable", (event, exeName: string) => {
+ipcMain.handle("run-executable", (event, exeRelativePath: string) => {
   return new Promise((resolve, reject) => {
-    const exePath = path.join(process.env.APP_ROOT!, exeName);
+    // dev vs packaged path
+    const basePath = app.isPackaged
+      ? path.join(process.resourcesPath, "public")
+      : path.join(__dirname, "../public");
+
+    const exePath = path.join(basePath, exeRelativePath);
+
+    console.log("Running exe:", exePath);
+
     const child = spawn(exePath, [], {
       windowsHide: true,
       cwd: path.dirname(exePath),
@@ -94,13 +102,13 @@ ipcMain.handle("run-executable", (event, exeName: string) => {
     let stdout = "";
     let stderr = "";
 
-    child.stdout.on("data", (data: Buffer) => {
-      const text = iconv.decode(data, "win1250"); // decode using correct encoding
+    child.stdout?.on("data", (data: Buffer) => {
+      const text = iconv.decode(data, "win1250");
       stdout += text;
       event.sender.send("exe-stdout", text);
     });
 
-    child.stderr.on("data", (data: Buffer) => {
+    child.stderr?.on("data", (data: Buffer) => {
       const text = iconv.decode(data, "win1250");
       stderr += text;
       event.sender.send("exe-stderr", text);
@@ -128,28 +136,68 @@ ipcMain.handle("get-public-path", (_, ...segments: string[]) => {
   return path.join(basePath, ...segments);
 });
 
+// Auto-updater configuration
+autoUpdater.autoDownload = false; // Don't auto-download, let user control
+autoUpdater.autoInstallOnAppQuit = true; // Install on app quit
+
 autoUpdater.on("checking-for-update", () => {
   win?.webContents.send("update-status", "Checking for updates...");
+  console.log("Checking for updates...");
 });
 
 autoUpdater.on("update-available", () => {
-  win?.webContents.send("update-status", "Downloading update...");
+  win?.webContents.send("update-status", "Update available. Starting download...");
+  console.log("Update available, starting download...");
+  // Auto-start download once update is available
+  autoUpdater.downloadUpdate();
+});
+
+autoUpdater.on("update-not-available", () => {
+  win?.webContents.send("update-status", "");
+  console.log("Already up to date.");
 });
 
 autoUpdater.on("download-progress", (progress) => {
-  win?.webContents.send("update-progress", progress.percent);
+  win?.webContents.send("update-progress", Math.round(progress.percent));
+  console.log(`Download progress: ${Math.round(progress.percent)}%`);
 });
 
 autoUpdater.on("update-downloaded", () => {
+  win?.webContents.send("update-status", "Update ready. Restart to install.");
   win?.webContents.send("update-ready");
+  console.log("Update downloaded and ready to install.");
 });
 
 autoUpdater.on("error", (err) => {
+  win?.webContents.send("update-status", "");
   win?.webContents.send("update-error", err.message);
+  console.error("Update error:", err.message);
+});
+
+// IPC handlers for update control
+ipcMain.handle("check-for-updates", async () => {
+  try {
+    const result = await autoUpdater.checkForUpdates();
+    return { found: !!result?.updateInfo };
+  } catch (err) {
+    console.error("Error checking for updates:", err);
+    throw err;
+  }
+});
+
+ipcMain.handle("restart-and-install", () => {
+  autoUpdater.quitAndInstall();
 });
 
 app.whenReady().then(() => {
   createWindow();
-  autoUpdater.checkForUpdatesAndNotify();
-})
+  
+  // Check for updates on app start
+  autoUpdater.checkForUpdates();
+  
+  // Check for updates every 10 minutes
+  setInterval(() => {
+    autoUpdater.checkForUpdates();
+  }, 10 * 60 * 1000);
+});
 

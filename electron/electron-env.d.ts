@@ -41,6 +41,9 @@ declare global {
       onStatus: (cb: (msg: string) => void) => void;
       onProgress: (cb: (percent: number) => void) => void;
       onReady: (cb: () => void) => void;
+      onError: (cb: (msg: string) => void) => void;
+      checkForUpdates: () => Promise<{ found: boolean }>;
+      restartAndInstall: () => void;
     };
   }
 }

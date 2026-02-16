@@ -82,4 +82,13 @@ contextBridge.exposeInMainWorld("updater", {
 
   onReady: (cb: () => void) =>
     ipcRenderer.on("update-ready", () => cb()),
+
+  onError: (cb: (msg: string) => void) =>
+    ipcRenderer.on("update-error", (_, msg: string) => cb(msg)),
+
+  checkForUpdates: () =>
+    ipcRenderer.invoke("check-for-updates"),
+
+  restartAndInstall: () =>
+    ipcRenderer.invoke("restart-and-install"),
 });
