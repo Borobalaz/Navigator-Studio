@@ -38,6 +38,9 @@
   },
   "main": "dist-electron/main.js",
   "build": {
+    "directories": {
+      "output": "dist"
+    },
     "appId": "com.navigator.studio",
     "files": [
       "dist/**",
@@ -53,15 +56,6 @@
         ]
       }
     ],
-    "mac": {
-      "target": "dmg"
-    },
-    "win": {
-      "target": "nsis"
-    },
-    "linux": {
-      "target": "AppImage"
-    },
     "asar": true,
     "productName": "Navigator Studio",
     "publish": [
