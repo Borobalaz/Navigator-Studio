@@ -7,5 +7,5 @@ const { execSync } = require('child_process');
 execSync('npm version patch', { stdio: 'inherit' });
 execSync('git push', { stdio: 'inherit' });
 execSync('npx electron-builder --publish always', {
-  stdio: 'inherit', env: process.env
+  stdio: 'inherit'
 });
