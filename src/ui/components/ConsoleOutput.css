@@ -9,6 +9,8 @@
   color: var(--text-color);
   min-height: 0;
   max-height: 200px;
+  min-width: 200px;
+  max-width: 500px;
   flex-shrink: 0;
 }
 
@@ -31,6 +33,7 @@
 /* Scrollbar width */
 .console-output-content::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
 }
 
 /* Scrollbar track (background) */

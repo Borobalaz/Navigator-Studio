@@ -35,7 +35,7 @@
 
 .folder-list-error {
   padding: 12px;
-  color: #ff6b6b;
+  color: #c92525;
   font-size: 12px;
   border-radius: 4px;
   background-color: rgba(255, 107, 107, 0.1);
@@ -49,5 +49,5 @@
   margin-bottom: 6px;
   cursor: pointer;
   user-select: none;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid var(--text-color);
 }
