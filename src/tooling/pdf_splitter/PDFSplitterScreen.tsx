@@ -1,36 +1,26 @@
 import "./PDFSplitterScreen.css";
 import { FolderList } from "../../ui/components/FileList/FolderList";
 import { ConsoleOutput } from "../../ui/components/ConsoleOutput";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
+import { usePublicPath } from "../../hooks/UsePublicPathHook";
+import { Button } from "../../ui/components/Button";
 
 export function PDFSplitterScreen() {
 
   let selectedTemplate = useState<string>("25M30");
-  const [folderPath, setFolderPath] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function loadPath() {
-      const path = await window.api.getPublicPath("pdf_szetszedo");
-      setFolderPath(path);
-    }
-
-    loadPath();
-  }, []);
+  const [folderPath, _setFolderPath] = usePublicPath("pdf_szetszedo");
 
   return (
     <div className="pdf-splitter-screen">
-      <div className="pdf-splitter-output">
-        <p>Output</p>
-        <ConsoleOutput />
-      </div>
+      <ConsoleOutput/>
       <div className="pdf-splitter-directories-panel">
         <FolderList
-          relativePath={folderPath ? `${folderPath}/in/${selectedTemplate[0]}` : ""}
+          path={folderPath ? `${folderPath}/in/${selectedTemplate[0]}` : ""}
           isDropZone={true}
           acceptFileTypes={[".pdf"]} />
         <DoubleArrowIcon id="pdf-splitter-arrow-icon" />
-        <FolderList relativePath={folderPath ? `${folderPath}/out/${selectedTemplate[0]}` : ""} />
+        <FolderList path={folderPath ? `${folderPath}/out/${selectedTemplate[0]}` : ""} />
       </div>
       <div className="pdf-splitter-control-panel">
         <div className="pdf-splitter-control-panel-selector">
@@ -43,10 +33,12 @@ export function PDFSplitterScreen() {
             <option value="JAR">Járulék</option>
           </select>
         </div>
-        <button onClick={() => window.api.runExe(
-          `pdf_szetszedo/pdf_szetszedo_${selectedTemplate[0]}.exe`
-        )}>PDF vágása</button>
-    </div>
+        <Button
+          onClick={() => window.api.runExe(
+            `pdf_szetszedo/pdf_szetszedo_${selectedTemplate[0]}.exe`
+          )}
+          text="PDF vágása" />
+      </div>
     </div >
   );
 }

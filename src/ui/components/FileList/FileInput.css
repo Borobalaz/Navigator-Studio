@@ -1,0 +1,82 @@
+/* Stylish drag-and-drop file input */
+.file-input {
+  border: 2px dashed rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(250,250,250,0.6));
+  transition: box-shadow 180ms ease, border-color 180ms ease, transform 120ms ease;
+  cursor: pointer;
+}
+
+.file-input:hover {
+  box-shadow: 0 6px 20px rgba(16, 24, 40, 0.04);
+  transform: translateY(-1px);
+}
+
+.file-input.drag-over {
+  border-color: #4aa3ff;
+  background: linear-gradient(180deg, rgba(74,163,255,0.06), rgba(240,248,255,0.8));
+  box-shadow: 0 10px 30px rgba(74,163,255,0.12);
+}
+
+.file-input-hidden {
+  position: absolute !important;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.file-input-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.file-input-icon {
+  color: var(--primary-color);
+  opacity: 0.9;
+}
+
+.file-input-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.file-input-text strong {
+  font-size: 14px;
+  color: #0b2540;
+}
+
+.file-input-text .muted {
+  font-size: 12px;
+  color: #6b7885;
+}
+
+.file-preview {
+  width: 100%;
+  list-style: none;
+  padding: 8px 12px;
+  margin: 0;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.02);
+}
+
+.file-preview-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 13px;
+  color: #102033;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+}
+
+.file-preview-item:last-child { border-bottom: none; }
+
+.file-name { max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-size { color: #75808a; font-size: 12px; }

@@ -8,11 +8,11 @@ type FolderEntry = {
 };
 
 export function FolderList({
-  relativePath,
+  path,
   isDropZone = false,
   acceptFileTypes = [],
 }: {
-  relativePath: string;
+  path: string;
   isDropZone?: boolean;
   acceptFileTypes?: string[];
 }) {
@@ -24,7 +24,7 @@ export function FolderList({
   const load = async (e?: React.MouseEvent<HTMLButtonElement>) => {
     if (e) e.stopPropagation();
     try {
-      const result = await window.api.readFolder(relativePath);
+      const result = await window.api.readFolder(path);
       setItems(result);
       setError(null);
     } catch {
@@ -34,7 +34,7 @@ export function FolderList({
 
   useEffect(() => {
     load();
-  }, [relativePath]);
+  }, [path]);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     if (!isDropZone) return;
@@ -80,10 +80,10 @@ export function FolderList({
 
     try {
       for (const file of filesToCopy) {
-        await window.api.copyFileToFolder(relativePath, file);
+        await window.api.copyFileToFolder(path, file);
       }
       // Reload folder contents
-      const result = await window.api.readFolder(relativePath);
+      const result = await window.api.readFolder(path);
       setItems(result);
     } catch (err) {
       setError(`Failed to copy file: ${err}`);
@@ -97,9 +97,10 @@ export function FolderList({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      onClick={() => window.api.openFolder(relativePath)}
       style={{ position: "relative" }}
     >
+      <p className="folder-list-path"
+        onClick={() => window.api.openFolder(path)}>{path}</p>
       <button
         ref={refreshRef}
         onClick={load}

@@ -61,7 +61,7 @@ contextBridge.exposeInMainWorld("api", {
     console.log(`File copied to ${filePath}`);
   },
 
-  runExe: (exePath: string) => ipcRenderer.invoke("run-executable", exePath),
+  runExe: (exePath: string, args?: string[]) => ipcRenderer.invoke("run-executable", exePath, args || []),
   onStdout: (callback: (data: string) => void) =>
     ipcRenderer.on("exe-stdout", (_e, data) => callback(data)),
   onStderr: (callback: (data: string) => void) =>

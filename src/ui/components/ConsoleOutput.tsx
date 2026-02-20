@@ -1,8 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import "./ConsoleOutput.css";
+import { stdioManager } from "../STDIOManager";
+import { Button } from "./Button";
 
 export function ConsoleOutput() {
-  const [log, setLog] = useState<string>(""); 
+  const [log, setLog] = useState<string>("");
   const logRef = useRef<HTMLPreElement | null>(null);
 
   // Auto-scroll on new logs
@@ -13,22 +15,21 @@ export function ConsoleOutput() {
   }, [log]);
 
   useEffect(() => {
-    const handleStdout = (data: string) => setLog((prev) => prev + data);
-    const handleStderr = (data: string) =>
-      setLog((prev) => prev + "[ERR] " + data);
+    const unsub = stdioManager.subscribe((entries) => {
+      const text = entries
+        .map((e) => (e.type === "stderr" ? `[ERR] ${e.text}` : e.text))
+        .join("");
+      setLog(text);
+    });
 
-    window.api.onStdout(handleStdout);
-    window.api.onStderr(handleStderr);
-
-    return () => {
-      // Cleanup listeners
-      // @ts-ignore
-      window.api.removeListener?.("exe-stdout", handleStdout);
-      // @ts-ignore
-      window.api.removeListener?.("exe-stderr", handleStderr);
-    };
+    return () => unsub();
   }, []);
 
-  if(log.length === 0) return <div className="console-output-placeholder">...</div>;
-  return <pre ref={logRef} className="console-output" lang="hu">{log}</pre>;
+  return (<div className="console-output">
+    <div className="console-output-header">
+      <p>STDIO Output</p>
+      <Button onClick={() => setLog("")} text="Clear" />
+    </div>
+    <pre ref={logRef} className="console-output-content" lang="hu">{log}</pre>
+  </div>);
 }

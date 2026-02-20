@@ -1,0 +1,14 @@
+.csv-joiner-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.csv-joiner-controls {
+  display: flex;
+  justify-content: space-evenly;
+  height: auto;
+  gap: 10px;
+  margin-bottom: 20px;
+}

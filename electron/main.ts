@@ -83,7 +83,7 @@ ipcMain.handle("close-window", () => {
   win?.close();
 });
 
-ipcMain.handle("run-executable", (event, exeRelativePath: string) => {
+ipcMain.handle("run-executable", (event, exeRelativePath: string, args: string[] = []) => {
   return new Promise((resolve, reject) => {
     // dev vs packaged path
     const basePath = app.isPackaged
@@ -92,9 +92,9 @@ ipcMain.handle("run-executable", (event, exeRelativePath: string) => {
 
     const exePath = path.join(basePath, exeRelativePath);
 
-    console.log("Running exe:", exePath);
+    console.log("Running exe:", exePath, "with args:", args);
 
-    const child = spawn(exePath, [], {
+    const child = spawn(exePath, args, {
       windowsHide: true,
       cwd: path.dirname(exePath),
     });

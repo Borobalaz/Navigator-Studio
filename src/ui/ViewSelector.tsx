@@ -7,6 +7,7 @@ import { tabManager } from "./TabManager";
 import { HomeScreen } from "../screens/HomeScreen";
 import { PDFSplitterScreen } from "../tooling/pdf_splitter/PDFSplitterScreen";
 import { globalSettings } from "../settings";
+import { CSVJoinerScreen } from "../tooling/csv_joiner/CSVJoinerScreen";
 
 export function ViewSelector() {
 
@@ -30,7 +31,16 @@ export function ViewSelector() {
               props: { text: "Számla kerekítő" }
             })
           }
-        }
+        },
+        {
+          label: "CSV összefűzése", onClick: () => {
+            tabManager.addTab({
+              label: "CSV összefűzése",
+              component: CSVJoinerScreen,
+              props: { text: "CSV összefűzése" }
+            })
+          }
+        },
       ]} />
       <ViewCard key="2" icon={ImportContactsIcon} programLabelProps={[
         {

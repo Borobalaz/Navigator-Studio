@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+public/csv_joiner/csvs/*
+public/pdf_splitter/in/*
+public/pdf_splitter/out/*
 
 # Editor directories and files
 .vscode/*
