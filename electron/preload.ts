@@ -30,9 +30,15 @@ contextBridge.exposeInMainWorld("api", {
     const fullPath = path.resolve(relativePath);
     console.log("Reading folder:", fullPath);
 
-    const dirents = await fs.promises.readdir(fullPath, {
-      withFileTypes: true,
-    });
+    // Ensure folder exists
+    try {
+      await fs.promises.access(fullPath, fs.constants.R_OK);
+    } catch {
+      await fs.promises.mkdir(fullPath, { recursive: true });
+      console.log("Folder created:", fullPath);
+    }
+
+    const dirents = await fs.promises.readdir(fullPath, { withFileTypes: true });
 
     return dirents.map((d) => ({
       name: d.name,

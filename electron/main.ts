@@ -1,9 +1,10 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import iconv from 'iconv-lite'
 import { autoUpdater } from 'electron-updater'
+import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -124,8 +125,25 @@ ipcMain.handle("run-executable", (event, exeRelativePath: string, args: string[]
 });
 
 ipcMain.handle("open-folder", async (_event, folderPath: string) => {
-  const { shell } = await import('electron');
-  await shell.openPath(folderPath);
+  try {
+    // Ensure the folder exists
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath, { recursive: true });
+      console.log("Folder created:", folderPath);
+    }
+
+    // Open the folder
+    const result = await shell.openPath(folderPath);
+    if (result) {
+      console.error("Failed to open folder:", result);
+      throw new Error(result);
+    }
+
+    return "Folder opened successfully";
+  } catch (err) {
+    console.error("Error opening folder:", err);
+    throw err;
+  }
 });
 
 ipcMain.handle("get-public-path", (_, ...segments: string[]) => {

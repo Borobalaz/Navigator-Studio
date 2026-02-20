@@ -1,58 +1,62 @@
-import { contextBridge as s, ipcRenderer as r } from "electron";
-import l from "fs";
-import i from "path";
-s.exposeInMainWorld("ipcRenderer", {
+import { contextBridge as c, ipcRenderer as n } from "electron";
+import i from "fs";
+import a from "path";
+c.exposeInMainWorld("ipcRenderer", {
   on(...e) {
-    const [o, n] = e;
-    return r.on(o, (t, ...a) => n(t, ...a));
+    const [o, r] = e;
+    return n.on(o, (t, ...s) => r(t, ...s));
   },
   off(...e) {
-    const [o, ...n] = e;
-    return r.off(o, ...n);
+    const [o, ...r] = e;
+    return n.off(o, ...r);
   },
   send(...e) {
-    const [o, ...n] = e;
-    return r.send(o, ...n);
+    const [o, ...r] = e;
+    return n.send(o, ...r);
   },
   invoke(...e) {
-    const [o, ...n] = e;
-    return r.invoke(o, ...n);
+    const [o, ...r] = e;
+    return n.invoke(o, ...r);
   }
   // You can expose other APTs you need here.
   // ...
 });
-s.exposeInMainWorld("api", {
+c.exposeInMainWorld("api", {
   readFolder: async (e) => {
-    const o = i.resolve(e);
-    return console.log("Reading folder:", o), (await l.promises.readdir(o, {
-      withFileTypes: !0
-    })).map((t) => ({
+    const o = a.resolve(e);
+    console.log("Reading folder:", o);
+    try {
+      await i.promises.access(o, i.constants.R_OK);
+    } catch {
+      await i.promises.mkdir(o, { recursive: !0 }), console.log("Folder created:", o);
+    }
+    return (await i.promises.readdir(o, { withFileTypes: !0 })).map((t) => ({
       name: t.name,
       isDirectory: t.isDirectory()
     }));
   },
-  getPublicPath: (...e) => r.invoke("get-public-path", ...e),
+  getPublicPath: (...e) => n.invoke("get-public-path", ...e),
   openFolder: async (e) => {
-    const o = i.resolve(e);
-    await r.invoke("open-folder", o);
+    const o = a.resolve(e);
+    await n.invoke("open-folder", o);
   },
   copyFileToFolder: async (e, o) => {
-    const n = i.resolve(e), t = i.join(n, o.name), a = await o.arrayBuffer(), d = Buffer.from(a);
-    await l.promises.writeFile(t, d), console.log(`File copied to ${t}`);
+    const r = a.resolve(e), t = a.join(r, o.name), s = await o.arrayBuffer(), l = Buffer.from(s);
+    await i.promises.writeFile(t, l), console.log(`File copied to ${t}`);
   },
-  runExe: (e, o) => r.invoke("run-executable", e, o || []),
-  onStdout: (e) => r.on("exe-stdout", (o, n) => e(n)),
-  onStderr: (e) => r.on("exe-stderr", (o, n) => e(n)),
-  removeListener: (e, o) => r.removeListener(e, o),
-  maximize: () => r.invoke("maximize-window"),
-  minimize: () => r.invoke("minimize-window"),
-  close: () => r.invoke("close-window")
+  runExe: (e, o) => n.invoke("run-executable", e, o || []),
+  onStdout: (e) => n.on("exe-stdout", (o, r) => e(r)),
+  onStderr: (e) => n.on("exe-stderr", (o, r) => e(r)),
+  removeListener: (e, o) => n.removeListener(e, o),
+  maximize: () => n.invoke("maximize-window"),
+  minimize: () => n.invoke("minimize-window"),
+  close: () => n.invoke("close-window")
 });
-s.exposeInMainWorld("updater", {
-  onStatus: (e) => r.on("update-status", (o, n) => e(n)),
-  onProgress: (e) => r.on("update-progress", (o, n) => e(n)),
-  onReady: (e) => r.on("update-ready", () => e()),
-  onError: (e) => r.on("update-error", (o, n) => e(n)),
-  checkForUpdates: () => r.invoke("check-for-updates"),
-  restartAndInstall: () => r.invoke("restart-and-install")
+c.exposeInMainWorld("updater", {
+  onStatus: (e) => n.on("update-status", (o, r) => e(r)),
+  onProgress: (e) => n.on("update-progress", (o, r) => e(r)),
+  onReady: (e) => n.on("update-ready", () => e()),
+  onError: (e) => n.on("update-error", (o, r) => e(r)),
+  checkForUpdates: () => n.invoke("check-for-updates"),
+  restartAndInstall: () => n.invoke("restart-and-install")
 });
