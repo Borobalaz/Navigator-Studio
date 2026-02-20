@@ -57,6 +57,14 @@
       }
     ],
     "asar": true,
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false
+    },
     "productName": "Navigator Studio",
     "publish": [
       {
