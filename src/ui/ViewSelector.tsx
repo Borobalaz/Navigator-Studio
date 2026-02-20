@@ -24,15 +24,6 @@ export function ViewSelector() {
           }
         },
         {
-          label: "Számla kerekítő", onClick: () => {
-            tabManager.addTab({
-              label: "Számla kerekítő",
-              component: HomeScreen,
-              props: { text: "Számla kerekítő" }
-            })
-          }
-        },
-        {
           label: "CSV összefűzése", onClick: () => {
             tabManager.addTab({
               label: "CSV összefűzése",
