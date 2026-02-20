@@ -1,62 +1,68 @@
-import { contextBridge as c, ipcRenderer as n } from "electron";
-import i from "fs";
-import a from "path";
-c.exposeInMainWorld("ipcRenderer", {
-  on(...e) {
-    const [o, r] = e;
-    return n.on(o, (t, ...s) => r(t, ...s));
+import { contextBridge, ipcRenderer } from "electron";
+import fs from "fs";
+import path from "path";
+contextBridge.exposeInMainWorld("ipcRenderer", {
+  on(...args) {
+    const [channel, listener] = args;
+    return ipcRenderer.on(channel, (event, ...args2) => listener(event, ...args2));
   },
-  off(...e) {
-    const [o, ...r] = e;
-    return n.off(o, ...r);
+  off(...args) {
+    const [channel, ...omit] = args;
+    return ipcRenderer.off(channel, ...omit);
   },
-  send(...e) {
-    const [o, ...r] = e;
-    return n.send(o, ...r);
+  send(...args) {
+    const [channel, ...omit] = args;
+    return ipcRenderer.send(channel, ...omit);
   },
-  invoke(...e) {
-    const [o, ...r] = e;
-    return n.invoke(o, ...r);
+  invoke(...args) {
+    const [channel, ...omit] = args;
+    return ipcRenderer.invoke(channel, ...omit);
   }
   // You can expose other APTs you need here.
   // ...
 });
-c.exposeInMainWorld("api", {
-  readFolder: async (e) => {
-    const o = a.resolve(e);
-    console.log("Reading folder:", o);
+contextBridge.exposeInMainWorld("api", {
+  readFolder: async (relativePath) => {
+    const fullPath = path.resolve(relativePath);
+    console.log("Reading folder:", fullPath);
     try {
-      await i.promises.access(o, i.constants.R_OK);
+      await fs.promises.access(fullPath, fs.constants.R_OK);
     } catch {
-      await i.promises.mkdir(o, { recursive: !0 }), console.log("Folder created:", o);
+      await fs.promises.mkdir(fullPath, { recursive: true });
+      console.log("Folder created:", fullPath);
     }
-    return (await i.promises.readdir(o, { withFileTypes: !0 })).map((t) => ({
-      name: t.name,
-      isDirectory: t.isDirectory()
+    const dirents = await fs.promises.readdir(fullPath, { withFileTypes: true });
+    return dirents.map((d) => ({
+      name: d.name,
+      isDirectory: d.isDirectory()
     }));
   },
-  getPublicPath: (...e) => n.invoke("get-public-path", ...e),
-  openFolder: async (e) => {
-    const o = a.resolve(e);
-    await n.invoke("open-folder", o);
+  getPublicPath: (...segments) => ipcRenderer.invoke("get-public-path", ...segments),
+  openFolder: async (relativePath) => {
+    const fullPath = path.resolve(relativePath);
+    await ipcRenderer.invoke("open-folder", fullPath);
   },
-  copyFileToFolder: async (e, o) => {
-    const r = a.resolve(e), t = a.join(r, o.name), s = await o.arrayBuffer(), l = Buffer.from(s);
-    await i.promises.writeFile(t, l), console.log(`File copied to ${t}`);
+  copyFileToFolder: async (folderPath, file) => {
+    const fullFolderPath = path.resolve(folderPath);
+    const filePath = path.join(fullFolderPath, file.name);
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    await fs.promises.writeFile(filePath, buffer);
+    console.log(`File copied to ${filePath}`);
   },
-  runExe: (e, o) => n.invoke("run-executable", e, o || []),
-  onStdout: (e) => n.on("exe-stdout", (o, r) => e(r)),
-  onStderr: (e) => n.on("exe-stderr", (o, r) => e(r)),
-  removeListener: (e, o) => n.removeListener(e, o),
-  maximize: () => n.invoke("maximize-window"),
-  minimize: () => n.invoke("minimize-window"),
-  close: () => n.invoke("close-window")
+  runExe: (exePath, args) => ipcRenderer.invoke("run-executable", exePath, args || []),
+  onStdout: (callback) => ipcRenderer.on("exe-stdout", (_e, data) => callback(data)),
+  onStderr: (callback) => ipcRenderer.on("exe-stderr", (_e, data) => callback(data)),
+  removeListener: (channel, callback) => ipcRenderer.removeListener(channel, callback),
+  maximize: () => ipcRenderer.invoke("maximize-window"),
+  minimize: () => ipcRenderer.invoke("minimize-window"),
+  close: () => ipcRenderer.invoke("close-window")
 });
-c.exposeInMainWorld("updater", {
-  onStatus: (e) => n.on("update-status", (o, r) => e(r)),
-  onProgress: (e) => n.on("update-progress", (o, r) => e(r)),
-  onReady: (e) => n.on("update-ready", () => e()),
-  onError: (e) => n.on("update-error", (o, r) => e(r)),
-  checkForUpdates: () => n.invoke("check-for-updates"),
-  restartAndInstall: () => n.invoke("restart-and-install")
+contextBridge.exposeInMainWorld("updater", {
+  onStatus: (cb) => ipcRenderer.on("update-status", (_, msg) => cb(msg)),
+  onProgress: (cb) => ipcRenderer.on("update-progress", (_, percent) => cb(percent)),
+  onReady: (cb) => ipcRenderer.on("update-ready", () => cb()),
+  onError: (cb) => ipcRenderer.on("update-error", (_, msg) => cb(msg)),
+  checkForUpdates: () => ipcRenderer.invoke("check-for-updates"),
+  restartAndInstall: () => ipcRenderer.invoke("restart-and-install")
 });
