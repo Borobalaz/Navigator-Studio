@@ -2,7 +2,7 @@ import './App.css'
 import { ViewSelector } from './ViewSelector'
 import { ScreenContainer } from './ScreenContainer'
 import { AppFooter } from './AppFooter';
-import { Tab, tabManager } from './TabManager';
+import { Tab, tabManager } from '../managers/TabManager';
 import { useEffect, useState } from 'react';
 import { globalSettings } from '../settings';
 import { AppHeader } from './AppHeader';

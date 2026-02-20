@@ -5,6 +5,7 @@ import { useState } from "react";
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import { usePublicPath } from "../../hooks/UsePublicPathHook";
 import { Button } from "../../ui/components/Button";
+import { fsManager } from "../../managers/FSManager";
 
 export function PDFSplitterScreen() {
 
@@ -34,9 +35,12 @@ export function PDFSplitterScreen() {
           </select>
         </div>
         <Button
-          onClick={() => window.api.runExe(
-            `pdf_szetszedo/pdf_szetszedo_${selectedTemplate[0]}.exe`
-          )}
+          onClick={async () => {
+            await window.api.runExe(
+              `pdf_szetszedo/pdf_szetszedo_${selectedTemplate[0]}.exe`
+            );
+            fsManager.emit();
+          }}
           text="PDF vágása" />
       </div>
     </div >

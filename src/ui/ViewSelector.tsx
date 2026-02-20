@@ -3,7 +3,7 @@ import { ViewCard } from './components/ViewCard'
 import ConstructionIcon from '@mui/icons-material/Construction';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
-import { tabManager } from "./TabManager";
+import { tabManager } from "../managers/TabManager";
 import { HomeScreen } from "../screens/HomeScreen";
 import { PDFSplitterScreen } from "../tooling/pdf_splitter/PDFSplitterScreen";
 import { globalSettings } from "../settings";
@@ -24,11 +24,11 @@ export function ViewSelector() {
           }
         },
         {
-          label: "CSV összefűzése", onClick: () => {
+          label: "CSV összesítő", onClick: () => {
             tabManager.addTab({
-              label: "CSV összefűzése",
+              label: "CSV összesítő",
               component: CSVJoinerScreen,
-              props: { text: "CSV összefűzése" }
+              props: { text: "CSV összesítő" }
             })
           }
         },

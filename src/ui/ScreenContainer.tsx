@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./ScreenContainer.css"
 import { TabCard } from "./components/TabCard";
-import { Tab, tabManager } from "./TabManager";
+import { Tab, tabManager } from "../managers/TabManager";
 
 interface ScreenContainerProps {
   tabs: Tab[]

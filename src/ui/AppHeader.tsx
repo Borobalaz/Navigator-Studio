@@ -3,14 +3,16 @@ import CloseIcon from '@mui/icons-material/Close';
 import MinimizeIcon from '@mui/icons-material/Minimize';
 import CropFreeIcon from '@mui/icons-material/CropFree';
 import { MouseEvent, ReactNode } from 'react';
+import Logo from './../assets/balazslogo.svg';
 
 export function AppHeader() {
+
   return (
     <div className="app-header">
-      <div className="app-header-title">
-      <img src="public/electron-vite.svg" alt="Logo" className="app-header-logo" />
-      <p>Navigator Studio</p>
+      <div className="app-header-logo-container">
+        <img src={Logo} alt="Logo" className="app-header-logo" />
       </div>
+      <p className="app-header-title">Navigator Studio</p>
       <div className="app-header-buttons">
         <TitlebarButton onClick={() => window.api.minimize()}>
           <MinimizeIcon />
@@ -40,7 +42,6 @@ export function TitlebarButton({
   className = "",
 }: TitlebarButtonProps) {
   const handleMouseDown = (e: MouseEvent<HTMLButtonElement>) => {
-    // Prevent focus + keep drag behavior stable in Electron
     e.preventDefault();
   };
 

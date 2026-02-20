@@ -1,6 +1,7 @@
 import { ipcRenderer, contextBridge } from 'electron'
 import fs from "fs";
 import path from "path";
+import { fsManager } from '../src/managers/FSManager';
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
@@ -64,6 +65,7 @@ contextBridge.exposeInMainWorld("api", {
 
     // Write to destination
     await fs.promises.writeFile(filePath, buffer);
+    fsManager.emit();
     console.log(`File copied to ${filePath}`);
   },
 

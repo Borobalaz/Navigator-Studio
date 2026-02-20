@@ -7,11 +7,11 @@ export interface StdEntry {
   ts: number;
 }
 
-type Listener = (entries: StdEntry[]) => void;
+type StdListener = (entries: StdEntry[]) => void;
 
 class STDIOManager {
   private entries: StdEntry[] = [];
-  private listeners = new Set<Listener>();
+  private listeners = new Set<StdListener>();
 
   constructor() {
     // Bind to preload API if available
@@ -50,7 +50,7 @@ class STDIOManager {
     this.notify();
   }
 
-  subscribe(cb: Listener) {
+  subscribe(cb: StdListener) {
     this.listeners.add(cb);
     // immediately send current state
     cb(this.getEntries());

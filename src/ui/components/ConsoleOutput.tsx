@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import "./ConsoleOutput.css";
-import { stdioManager } from "../STDIOManager";
+import { stdioManager } from "../../managers/STDIOManager";
 import { Button } from "./Button";
 
 export function ConsoleOutput() {

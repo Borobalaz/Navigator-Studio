@@ -1,18 +1,24 @@
 .app-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: 1fr;
   height: 40px;
   align-items: center;
-  padding: 0px;
   justify-content: space-between;
-  background-color: var(--shade-color);
+  background: linear-gradient(to left, var(--app-header-color), var(--bg-color));
   color: var(--text-color);
 
   -webkit-app-region: drag;
 }
 
+.app-header-logo {
+  height: 50px;
+  width: 40px;
+}
+
 .app-header-buttons {
   display: flex;
-  height: 40px;
+  height: 50px;
   justify-content: flex-end;
   align-items: center;
   -webkit-app-region: no-drag;
@@ -21,19 +27,20 @@
 .app-header-buttons button {
   width: 100%;
   font-size: small;
-  height: 40px;
+  height: 100%;
   width: 50px;
   color: var(--text-color);
-  background-color: var(--shade-color);
+  background-color: var(--app-header-color);
   transition: background-color 0.2s ease;
   box-sizing: border-box;
+  align-items: center;
   cursor: pointer;
   outline: none;
   padding: 0px;
 }
 
 .app-header-buttons button:hover {
-  background-color: var(--text-color-other);
+  background-color: var(--shade-color);
 }
 
 .app-header-buttons #close-button:hover {
@@ -42,15 +49,9 @@
 
 .app-header-title {
   display: flex;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 800;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
   color: var(--text-color);
-  padding-left: 10px;
-}
-
-.app-header-logo {
-  height: 20px;
-  width: 20px;
 }

@@ -90,4 +90,5 @@ button:focus-visible {
 	--primary-color: #652b52;
 	--secondary-color: #e0498f;
   --text-color-other: #b5b5b5;
+  --app-header-color: #b9b9b9;
 }

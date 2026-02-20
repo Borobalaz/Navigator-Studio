@@ -30,7 +30,7 @@ let win: BrowserWindow | null
 
 function createWindow() {
   win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC!, 'a_logo_2_S.jpg'),
+    icon: path.join(process.env.VITE_PUBLIC!, 'balazslogo.svg'),
     title: "Navigator Studio",
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),

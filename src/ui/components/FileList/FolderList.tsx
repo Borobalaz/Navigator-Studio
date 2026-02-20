@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { FolderItem } from "./FolderItem";
 import "./FolderList.css";
+import { fsManager } from "../../../managers/FSManager";
 
 type FolderEntry = {
   name: string;
@@ -33,6 +34,7 @@ export function FolderList({
   };
 
   useEffect(() => {
+    const unsub = fsManager.subscribe(() => load());
     load();
   }, [path]);
 
