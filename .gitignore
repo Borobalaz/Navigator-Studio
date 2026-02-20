@@ -12,8 +12,19 @@ dist
 dist-ssr
 *.local
 public/csv_joiner/csvs/*
-public/pdf_splitter/in/*
-public/pdf_splitter/out/*
+public/pdf_splitter/in/24M30/*
+public/pdf_splitter/in/25M30/*
+public/pdf_splitter/in/BER/*
+public/pdf_splitter/in/EFO/*
+public/pdf_splitter/in/EKHO/*
+public/pdf_splitter/in/JAR/*
+
+public/pdf_splitter/out/24M30/*
+public/pdf_splitter/out/25M30/*
+public/pdf_splitter/out/BER/*
+public/pdf_splitter/out/EFO/*
+public/pdf_splitter/out/EKHO/*
+public/pdf_splitter/out/JAR/*
 
 # Editor directories and files
 .vscode/*
