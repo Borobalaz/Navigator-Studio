@@ -36,6 +36,7 @@ export function FolderList({
   useEffect(() => {
     const unsub = fsManager.subscribe(() => load());
     load();
+    return () => unsub();
   }, [path]);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {

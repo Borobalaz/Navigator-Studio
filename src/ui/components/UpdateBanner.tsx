@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import "./UpdateBanner.css";
+import { Slider } from "@mui/material";
 
 export function UpdateBanner() {
   const [status, setStatus] = useState("");
@@ -28,39 +30,50 @@ export function UpdateBanner() {
     window.updater.restartAndInstall();
   };
 
-  if (!status && !isReady && !error) {
-    return null;
-  }
+  //if (!status && !isReady && !error) {
+  //  return (
+  //    <div className={`update-banner ${status}`}>
+  //      Az alkalmazás naprakész!
+  //    </div>
+  //  );
+  //}
 
   if (error) {
     return (
-      <div style={{ padding: "10px", backgroundColor: "#ffebee", color: "#c62828", borderRadius: "4px" }}>
-        <p>Update error: {error}</p>
+      <div className="update-banner">
+        Update error: {error}
       </div>
     );
   }
 
   if (isReady) {
     return (
-      <div style={{ padding: "10px", backgroundColor: "#e8f5e9", color: "#2e7d32", borderRadius: "4px" }}>
-        <p>Update ready! Restart now to install.</p>
-        <button onClick={handleRestart} style={{ marginTop: "8px", padding: "6px 12px", cursor: "pointer" }}>
-          Restart & Install
+      <div className={`update-banner update-ready`}>
+        <button onClick={handleRestart}>
+          Újraindítás
         </button>
+        Update ready! Restart now to install.
       </div>
     );
   }
 
   if (status) {
     return (
-      <div style={{ padding: "10px", backgroundColor: "#e3f2fd", color: "#1565c0", borderRadius: "4px" }}>
-        <p>{status}</p>
+      <div className="update-banner update-downloading">
+        <Slider
+          value={progress ?? 0}
+          max={100}
+          className="update-slider"
+        />
+
         {progress > 0 && (
-          <div style={{ marginTop: "8px" }}>
-            <progress value={progress} max={100} style={{ width: "100%" }} />
-            <span style={{ marginLeft: "10px", fontSize: "0.9em" }}>{progress}%</span>
+          <div className="progress-info">
+            <span>{progress}%</span>
           </div>
         )}
+        <div className="status-text">
+          {status}
+        </div>
       </div>
     );
   }

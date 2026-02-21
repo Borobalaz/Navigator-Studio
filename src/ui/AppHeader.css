@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   grid-template-rows: 1fr;
-  height: 40px;
+  height: 100%px;
   align-items: center;
   justify-content: space-between;
   background: linear-gradient(to left, var(--app-header-color), var(--bg-color));
@@ -12,13 +12,13 @@
 }
 
 .app-header-logo {
-  height: 50px;
+  height: 40px;
   width: 40px;
 }
 
 .app-header-buttons {
   display: flex;
-  height: 50px;
+  height: 40px;
   justify-content: flex-end;
   align-items: center;
   -webkit-app-region: no-drag;
@@ -54,4 +54,5 @@
   align-items: center;
   justify-content: center;
   color: var(--text-color);
+  margin: 0px;
 }

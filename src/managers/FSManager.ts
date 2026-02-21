@@ -9,7 +9,7 @@ class FSManager {
   
   subscribe(cb: FsListener) {
     this.listeners.add(cb);
-    return () => this.listeners.delete(cb);
+    return () => {this.listeners.delete(cb);}
   }
   emit() {
     for (const l of this.listeners) l();
