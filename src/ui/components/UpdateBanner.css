@@ -43,10 +43,8 @@
   /* Filled portion */
   .update-slider .slider-range,
   .update-slider [data-radix-slider-range] {
-    background: #4f46e5;
-    /* nice blue */
+    background: var(--secondary-color);
     height: 100%;
-    border-radius: 999px;
     transition: width 0.2s ease;
   }
 
