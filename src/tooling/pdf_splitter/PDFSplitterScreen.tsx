@@ -15,14 +15,16 @@ export function PDFSplitterScreen() {
   return (
     <div className="pdf-splitter-screen">
       <ConsoleOutput/>
-      <div className="pdf-splitter-directories-panel">
-        <FolderList
-          path={folderPath ? `${folderPath}/in/${selectedTemplate[0]}` : ""}
-          isDropZone={true}
-          acceptFileTypes={[".pdf"]} />
-        <DoubleArrowIcon id="pdf-splitter-arrow-icon" />
-        <FolderList path={folderPath ? `${folderPath}/out/${selectedTemplate[0]}` : ""} />
-      </div>
+      {folderPath && (
+        <div className="pdf-splitter-directories-panel">
+          <FolderList
+            path={`${folderPath}/in/${selectedTemplate[0]}`}
+            isDropZone={true}
+            acceptFileTypes={[".pdf"]} />
+          <DoubleArrowIcon id="pdf-splitter-arrow-icon" />
+          <FolderList path={`${folderPath}/out/${selectedTemplate[0]}`} />
+        </div>
+      )}
       <div className="pdf-splitter-control-panel">
         <div className="pdf-splitter-control-panel-selector">
           <p>Séma: </p>

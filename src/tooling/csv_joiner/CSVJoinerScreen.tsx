@@ -21,7 +21,7 @@ export function CSVJoinerScreen() {
         />
         <Button onClick={() => window.api.runExe("csv_joiner/csv_joiner.exe", excelFilePath)} text="CSV összefűzése" />
       </div>
-      <FolderList path={folderPath ? `${folderPath}/csvs` : ""} />
+      {folderPath && <FolderList path={`${folderPath}/csvs`} />}
     </div >
   );
 }
