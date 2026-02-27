@@ -8,6 +8,7 @@ import { HomeScreen } from "../screens/HomeScreen";
 import { PDFSplitterScreen } from "../tooling/pdf_splitter/PDFSplitterScreen";
 import { globalSettings } from "../settings";
 import { CSVJoinerScreen } from "../tooling/csv_joiner/CSVJoinerScreen";
+import { AutomaticSignerScreen } from "../tooling/automatic_signer/AutomaticSignerScreen";
 
 export function ViewSelector() {
 
@@ -29,6 +30,15 @@ export function ViewSelector() {
               label: "CSV összesítő",
               component: CSVJoinerScreen,
               props: { text: "CSV összesítő" }
+            })
+          }
+        },
+                {
+          label: "Aláírás", onClick: () => {
+            tabManager.addTab({
+              label: "Aláírás",
+              component: AutomaticSignerScreen,
+              props: { text: "Aláírás" }
             })
           }
         },

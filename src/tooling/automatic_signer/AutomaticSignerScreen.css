@@ -1,0 +1,46 @@
+.signer-screen {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  height: 100%;
+  background-color: var(--shade-color);
+  color: var(--text-color);
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif; /* Ensure Hungarian special characters display correctly */
+}
+
+.signer-controls {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  gap: 12px;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 8px;
+  background-color: var(--shade-color);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
+}
+
+.signer-directories-panel {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 6px;
+  background-color: var(--shade-color);
+  height: 100%;
+}
+
+#signer-arrow-icon {
+  align-self: center;
+  font-size: 32px;
+  color: var(--primary-color);
+}

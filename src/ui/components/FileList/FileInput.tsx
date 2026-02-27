@@ -11,6 +11,7 @@ type FileInputProps = {
   onFilesSelected: (paths: string[]) => void;
   acceptFileTypes?: string[];
   multiple?: boolean;
+  text?: string;
 };
 
 type ElectronFile = File & { path: string };
@@ -19,6 +20,7 @@ export function FileInput({
   onFilesSelected,
   acceptFileTypes = [],
   multiple = false,
+  text = ""
 }: FileInputProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -104,9 +106,9 @@ export function FileInput({
         </svg>
 
         <div className="file-input-text">
-          <strong>Húzd ide a fájlokat</strong>
+          <strong>{text || "Húzd ide a fájlokat"}</strong>
           <span className="muted">
-            vagy kattints a gépedről való kiválasztáshoz
+            Húzd ide a fájlokat vagy kattints a gépedről való kiválasztáshoz
           </span>
         </div>
       </div>
