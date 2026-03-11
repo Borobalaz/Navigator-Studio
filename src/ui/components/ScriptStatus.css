@@ -1,0 +1,66 @@
+.runtime-status-console {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--shade-color);
+  border-radius: 6px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text-color);
+  width: 100%;
+}
+
+.runtime-progress-container {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(100, 100, 100, 0.5);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.runtime-progress-bar {
+  height: 100%;
+  background-color: var(--primary-color);
+  transition: width 0.2s ease;
+}
+
+.runtime-progress-text {
+  text-align: right;
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.runtime-exit {
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.runtime-exit-success {
+  background-color: rgba(0, 255, 0, 0.1);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.runtime-exit-error,
+.runtime-exit-system_error,
+.runtime-exit-validation_error {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+}
+
+.runtime-exit-warning {
+  background-color: rgba(255, 165, 0, 0.1);
+  border: 1px solid rgba(255, 165, 0, 0.3);
+}
+
+.runtime-raw-log {
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.runtime-stderr {
+  color: #ff6b6b;
+  word-break: break-word;
+}

@@ -1,11 +1,12 @@
 import "./PDFSplitterScreen.css";
 import { FolderList } from "../../ui/components/FileList/FolderList";
-import { ConsoleOutput } from "../../ui/components/ConsoleOutput";
 import { useState } from "react";
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import { usePublicPath } from "../../hooks/UsePublicPathHook";
 import { Button } from "../../ui/components/Button";
 import { fsManager } from "../../managers/FSManager";
+import { ScriptStatus } from "../../ui/components/ScriptStatus";
+import { stdioManager } from "../../managers/STDIOManager";
 
 export function PDFSplitterScreen() {
 
@@ -14,7 +15,7 @@ export function PDFSplitterScreen() {
 
   return (
     <div className="pdf-splitter-screen">
-      <ConsoleOutput/>
+      <ScriptStatus />
       {folderPath && (
         <div className="pdf-splitter-directories-panel">
           <FolderList
@@ -38,6 +39,7 @@ export function PDFSplitterScreen() {
         </div>
         <Button
           onClick={async () => {
+            stdioManager.clear();
             await window.api.runExe(
               `pdf_szetszedo/pdf_szetszedo_${selectedTemplate[0]}.exe`
             );

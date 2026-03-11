@@ -29,14 +29,12 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 contextBridge.exposeInMainWorld("api", {
   readFolder: async (relativePath: string) => {
     const fullPath = path.resolve(relativePath);
-    console.log("Reading folder:", fullPath);
 
     // Ensure folder exists
     try {
       await fs.promises.access(fullPath, fs.constants.R_OK);
     } catch {
       await fs.promises.mkdir(fullPath, { recursive: true });
-      console.log("Folder created:", fullPath);
     }
 
     const dirents = await fs.promises.readdir(fullPath, { withFileTypes: true });
@@ -66,7 +64,6 @@ contextBridge.exposeInMainWorld("api", {
     // Write to destination
     await fs.promises.writeFile(filePath, buffer);
     fsManager.emit();
-    console.log(`File copied to ${filePath}`);
   },
 
   runExe: (exePath: string, args?: string[]) => ipcRenderer.invoke("run-executable", exePath, args || []),
@@ -79,6 +76,7 @@ contextBridge.exposeInMainWorld("api", {
   maximize: () => ipcRenderer.invoke("maximize-window"),
   minimize: () => ipcRenderer.invoke("minimize-window"),
   close: () => ipcRenderer.invoke("close-window"),
+  openFile: (path: string) => ipcRenderer.invoke("open-file", path),
 });
 
 contextBridge.exposeInMainWorld("updater", {

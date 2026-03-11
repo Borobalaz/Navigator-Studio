@@ -7,14 +7,13 @@ export interface StdEntry {
   ts: number;
 }
 
-type StdListener = (entries: StdEntry[]) => void;
+type StdListener = (entry: StdEntry | null) => void;
 
 class STDIOManager {
   private entries: StdEntry[] = [];
   private listeners = new Set<StdListener>();
 
   constructor() {
-    // Bind to preload API if available
     const api = (window as any).api;
     if (api && typeof api.onStdout === "function") {
       api.onStdout((data: string) => this.push("stdout", data));
@@ -24,21 +23,44 @@ class STDIOManager {
     }
   }
 
-  private notify() {
-    const snapshot = [...this.entries];
-    for (const l of this.listeners) l(snapshot);
+  private notify(entry: StdEntry | null) {
+    if (!entry) {
+      for (const l of this.listeners) l(null);
+      return;
+    }
+    for (const l of this.listeners) l(entry);
   }
 
   push(type: StdType, text: string) {
-    const entry: StdEntry = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-      type,
-      text,
-      ts: Date.now(),
-    };
-    this.entries.push(entry);
-    this.notify();
-    return entry;
+    if (type === "stdout") {
+      // Split concatenated JSON objects (handles multiple JSON in one write)
+      const parts = text.split(/(?<=})\s*(?={)/);
+
+      const entries: StdEntry[] = parts.map(part => ({
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+        type,
+        text: part,
+        ts: Date.now(),
+      }));
+
+      // Store and notify each entry
+      for (const entry of entries) {
+        this.entries.push(entry);
+        this.notify(entry);
+      }
+
+      return entries;
+    } else {
+      const entry: StdEntry = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+        type,
+        text,
+        ts: Date.now(),
+      };
+      this.entries.push(entry);
+      this.notify(entry);
+      return [entry];
+    }
   }
 
   getEntries() {
@@ -47,13 +69,11 @@ class STDIOManager {
 
   clear() {
     this.entries = [];
-    this.notify();
+    this.notify(null);
   }
 
   subscribe(cb: StdListener) {
     this.listeners.add(cb);
-    // immediately send current state
-    cb(this.getEntries());
     return () => { this.listeners.delete(cb); };
   }
 }

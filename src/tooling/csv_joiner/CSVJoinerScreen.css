@@ -1,13 +1,21 @@
 .csv-joiner-screen {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
   gap: 20px;
   padding: 20px;
 }
 
 .csv-joiner-controls {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   justify-content: space-evenly;
   height: auto;
   gap: 10px;
+}
+
+.folder-list {
+  grid-column: 1 / span 2;
+  grid-row: 2;
 }

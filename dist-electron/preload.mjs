@@ -1,79 +1,85 @@
-var u = Object.defineProperty;
-var m = (o, e, r) => e in o ? u(o, e, { enumerable: !0, configurable: !0, writable: !0, value: r }) : o[e] = r;
-var c = (o, e, r) => m(o, typeof e != "symbol" ? e + "" : e, r);
-import { contextBridge as l, ipcRenderer as n } from "electron";
-import s from "fs";
-import i from "path";
-class p {
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+import { contextBridge, ipcRenderer } from "electron";
+import fs from "fs";
+import path from "path";
+class FSManager {
   constructor() {
-    c(this, "listeners", /* @__PURE__ */ new Set());
+    __publicField(this, "listeners", /* @__PURE__ */ new Set());
   }
-  subscribe(e) {
-    return this.listeners.add(e), () => {
-      this.listeners.delete(e);
+  subscribe(cb) {
+    this.listeners.add(cb);
+    return () => {
+      this.listeners.delete(cb);
     };
   }
   emit() {
-    for (const e of this.listeners) e();
+    for (const l of this.listeners) l();
   }
 }
-const f = new p();
-l.exposeInMainWorld("ipcRenderer", {
-  on(...o) {
-    const [e, r] = o;
-    return n.on(e, (t, ...a) => r(t, ...a));
+const fsManager = new FSManager();
+contextBridge.exposeInMainWorld("ipcRenderer", {
+  on(...args) {
+    const [channel, listener] = args;
+    return ipcRenderer.on(channel, (event, ...args2) => listener(event, ...args2));
   },
-  off(...o) {
-    const [e, ...r] = o;
-    return n.off(e, ...r);
+  off(...args) {
+    const [channel, ...omit] = args;
+    return ipcRenderer.off(channel, ...omit);
   },
-  send(...o) {
-    const [e, ...r] = o;
-    return n.send(e, ...r);
+  send(...args) {
+    const [channel, ...omit] = args;
+    return ipcRenderer.send(channel, ...omit);
   },
-  invoke(...o) {
-    const [e, ...r] = o;
-    return n.invoke(e, ...r);
+  invoke(...args) {
+    const [channel, ...omit] = args;
+    return ipcRenderer.invoke(channel, ...omit);
   }
   // You can expose other APTs you need here.
   // ...
 });
-l.exposeInMainWorld("api", {
-  readFolder: async (o) => {
-    const e = i.resolve(o);
-    console.log("Reading folder:", e);
+contextBridge.exposeInMainWorld("api", {
+  readFolder: async (relativePath) => {
+    const fullPath = path.resolve(relativePath);
     try {
-      await s.promises.access(e, s.constants.R_OK);
+      await fs.promises.access(fullPath, fs.constants.R_OK);
     } catch {
-      await s.promises.mkdir(e, { recursive: !0 }), console.log("Folder created:", e);
+      await fs.promises.mkdir(fullPath, { recursive: true });
     }
-    return (await s.promises.readdir(e, { withFileTypes: !0 })).map((t) => ({
-      name: t.name,
-      isDirectory: t.isDirectory()
+    const dirents = await fs.promises.readdir(fullPath, { withFileTypes: true });
+    return dirents.map((d) => ({
+      name: d.name,
+      isDirectory: d.isDirectory()
     }));
   },
-  getPublicPath: (...o) => n.invoke("get-public-path", ...o),
-  openFolder: async (o) => {
-    const e = i.resolve(o);
-    await n.invoke("open-folder", e);
+  getPublicPath: (...segments) => ipcRenderer.invoke("get-public-path", ...segments),
+  openFolder: async (relativePath) => {
+    const fullPath = path.resolve(relativePath);
+    await ipcRenderer.invoke("open-folder", fullPath);
   },
-  copyFileToFolder: async (o, e) => {
-    const r = i.resolve(o), t = i.join(r, e.name), a = await e.arrayBuffer(), d = Buffer.from(a);
-    await s.promises.writeFile(t, d), f.emit(), console.log(`File copied to ${t}`);
+  copyFileToFolder: async (folderPath, file) => {
+    const fullFolderPath = path.resolve(folderPath);
+    const filePath = path.join(fullFolderPath, file.name);
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    await fs.promises.writeFile(filePath, buffer);
+    fsManager.emit();
   },
-  runExe: (o, e) => n.invoke("run-executable", o, e || []),
-  onStdout: (o) => n.on("exe-stdout", (e, r) => o(r)),
-  onStderr: (o) => n.on("exe-stderr", (e, r) => o(r)),
-  removeListener: (o, e) => n.removeListener(o, e),
-  maximize: () => n.invoke("maximize-window"),
-  minimize: () => n.invoke("minimize-window"),
-  close: () => n.invoke("close-window")
+  runExe: (exePath, args) => ipcRenderer.invoke("run-executable", exePath, args || []),
+  onStdout: (callback) => ipcRenderer.on("exe-stdout", (_e, data) => callback(data)),
+  onStderr: (callback) => ipcRenderer.on("exe-stderr", (_e, data) => callback(data)),
+  removeListener: (channel, callback) => ipcRenderer.removeListener(channel, callback),
+  maximize: () => ipcRenderer.invoke("maximize-window"),
+  minimize: () => ipcRenderer.invoke("minimize-window"),
+  close: () => ipcRenderer.invoke("close-window"),
+  openFile: (path2) => ipcRenderer.invoke("open-file", path2)
 });
-l.exposeInMainWorld("updater", {
-  onStatus: (o) => n.on("update-status", (e, r) => o(r)),
-  onProgress: (o) => n.on("update-progress", (e, r) => o(r)),
-  onReady: (o) => n.on("update-ready", () => o()),
-  onError: (o) => n.on("update-error", (e, r) => o(r)),
-  checkForUpdates: () => n.invoke("check-for-updates"),
-  restartAndInstall: () => n.invoke("restart-and-install")
+contextBridge.exposeInMainWorld("updater", {
+  onStatus: (cb) => ipcRenderer.on("update-status", (_, msg) => cb(msg)),
+  onProgress: (cb) => ipcRenderer.on("update-progress", (_, percent) => cb(percent)),
+  onReady: (cb) => ipcRenderer.on("update-ready", () => cb()),
+  onError: (cb) => ipcRenderer.on("update-error", (_, msg) => cb(msg)),
+  checkForUpdates: () => ipcRenderer.invoke("check-for-updates"),
+  restartAndInstall: () => ipcRenderer.invoke("restart-and-install")
 });

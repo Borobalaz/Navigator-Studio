@@ -4,11 +4,15 @@ import ConstructionIcon from '@mui/icons-material/Construction';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import { tabManager } from "../managers/TabManager";
-import { HomeScreen } from "../screens/HomeScreen";
 import { PDFSplitterScreen } from "../tooling/pdf_splitter/PDFSplitterScreen";
 import { globalSettings } from "../settings";
 import { CSVJoinerScreen } from "../tooling/csv_joiner/CSVJoinerScreen";
 import { AutomaticSignerScreen } from "../tooling/automatic_signer/AutomaticSignerScreen";
+import { ConsoleOutput } from "./components/ConsoleOutput";
+import { ScriptStatus } from "./components/ScriptStatus";
+import { FolderList } from "./components/FileList/FolderList";
+import { FileInput } from "./components/FileList/FileInput";
+import BugReportIcon from '@mui/icons-material/BugReport';
 
 export function ViewSelector() {
 
@@ -33,7 +37,7 @@ export function ViewSelector() {
             })
           }
         },
-                {
+        {
           label: "Aláírás", onClick: () => {
             tabManager.addTab({
               label: "Aláírás",
@@ -43,16 +47,44 @@ export function ViewSelector() {
           }
         },
       ]} />
-      <ViewCard key="2" icon={ImportContactsIcon} programLabelProps={[
+      <ViewCard key="2" icon={BugReportIcon} programLabelProps={[
         {
-          label: "Teendők", onClick: () => {
+          label: "ConsoleOutput", onClick: () => {
             tabManager.addTab({
-              label: "Teendők",
-              component: HomeScreen,
-              props: { text: "Teendők" }
+              label: "ConsoleOutput",
+              component: ConsoleOutput,
+              props: {}
             })
           }
         },
+        {
+          label: "ScriptStatus", onClick: () => {
+            tabManager.addTab({
+              label: "ScriptStatus",
+              component:  ScriptStatus,
+              props: {}
+            })
+          }
+        },
+        {
+          label: "FolderList", onClick: () => {
+            tabManager.addTab({
+              label: "FolderList",
+              component: FolderList,
+              props: {}
+            })
+          }
+        },
+        {
+          label: "FileInput", onClick: () => {
+            tabManager.addTab({
+              label: "FileInput",
+              component: FileInput,
+              props: {}
+            })
+          }
+        },
+        
       ]} />
       <div className="view-selector-settings">
         <ViewCard key="6" icon={SettingsIcon} programLabelProps={[

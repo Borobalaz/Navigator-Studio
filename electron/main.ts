@@ -54,6 +54,18 @@ function createWindow() {
   }
 }
 
+export function openFile(filePath: string) {
+  if (!filePath) return;
+
+  // Use Electron's shell API
+  shell.openPath(filePath)
+    .then((errorMessage) => {
+      if (errorMessage) {
+        console.error("Failed to open file:", errorMessage);
+      }
+    });
+}
+
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
@@ -146,6 +158,16 @@ ipcMain.handle("open-folder", async (_event, folderPath: string) => {
   }
 });
 
+ipcMain.handle("open-file", async (_event, filePath: string) => {
+  // dev vs packaged path
+  const basePath = app.isPackaged
+    ? path.join(process.resourcesPath, "public")
+    : path.join(__dirname, "../public");
+
+  openFile(path.join(basePath, filePath));
+  return true; // indicate success
+});
+
 ipcMain.handle("get-public-path", (_, ...segments: string[]) => {
   const basePath = app.isPackaged
     ? path.join(process.resourcesPath, "public")
@@ -209,10 +231,10 @@ ipcMain.handle("restart-and-install", () => {
 
 app.whenReady().then(() => {
   createWindow();
-  
+
   // Check for updates on app start
   autoUpdater.checkForUpdates();
-  
+
   // Check for updates every 10 minutes
   setInterval(() => {
     autoUpdater.checkForUpdates();

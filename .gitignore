@@ -37,3 +37,16 @@ public/pdf_splitter/out/JAR/*
 *.sln
 *.sw?
 .env
+public/automatic_signer/input/00b04883-17b9-4f0a-a049-b7c829dea0be.pdf
+public/automatic_signer/output/signed_00b04883-17b9-4f0a-a049-b7c829dea0be.pdf
+public/csv_joiner/combined.xlsx
+
+scripts/*/.dist
+scripts/*/build
+scripts/*/dist
+scripts/*/*.spec
+scripts/*/input
+scripts/*/output
+scripts/*/csvs
+scripts/*/in
+scripts/*/out

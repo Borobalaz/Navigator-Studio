@@ -1,24 +1,30 @@
 .signer-screen {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   grid-template-rows: auto 1fr;
-  gap: 12px;
+  gap: 20px;
   width: 100%;
   padding: 12px;
   height: 100%;
   background-color: var(--shade-color);
   color: var(--text-color);
   box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif; /* Ensure Hungarian special characters display correctly */
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.script-status-console {
+  width: 100%;
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .signer-controls {
-  grid-column: 1;
+  grid-column: 2;
   grid-row: 1;
   display: flex;
   gap: 12px;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-evenly;
   padding: 8px;
   background-color: var(--shade-color);
   border-radius: 6px;
@@ -27,7 +33,7 @@
 }
 
 .signer-directories-panel {
-  grid-column: 1;
+  grid-column: 1 / span 2;
   grid-row: 2;
   display: flex;
   justify-content: center;
@@ -37,6 +43,7 @@
   border-radius: 6px;
   background-color: var(--shade-color);
   height: 100%;
+  width: 100%;
 }
 
 #signer-arrow-icon {
