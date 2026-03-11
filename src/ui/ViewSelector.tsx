@@ -2,7 +2,6 @@ import "./ViewSelector.css"
 import { ViewCard } from './components/ViewCard'
 import ConstructionIcon from '@mui/icons-material/Construction';
 import SettingsIcon from '@mui/icons-material/Settings';
-import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import { tabManager } from "../managers/TabManager";
 import { PDFSplitterScreen } from "../tooling/pdf_splitter/PDFSplitterScreen";
 import { globalSettings } from "../settings";
