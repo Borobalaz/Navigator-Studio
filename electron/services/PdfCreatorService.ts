@@ -30,7 +30,8 @@ export class PdfCreatorService {
       return path.join(process.cwd(), 'public', 'pdf_templates');
     } else {
       // Packaged mode
-      return path.join(app.getAppPath(), '..', 'resources', 'public', 'pdf_templates');
+      const resourcesBase = process.resourcesPath || path.join(path.dirname(app.getAppPath()), '..');
+      return path.join(resourcesBase, 'public', 'pdf_templates');
     }
   }
 
