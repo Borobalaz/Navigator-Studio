@@ -1,4 +1,6 @@
 .view-card-screen-selector {
+  display: flex;
+  flex-direction: column;
   position: absolute;
   top: 25%;
   left: 80%;
@@ -10,6 +12,7 @@
   border-radius: 5px;
   padding: 2px 2px;
   min-width: 150px;
+  width: max-content;
 
   z-index: 9999;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.35);

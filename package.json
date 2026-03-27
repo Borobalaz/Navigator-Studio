@@ -15,9 +15,12 @@
     "@mui/icons-material": "^7.3.5",
     "@mui/material": "^7.3.5",
     "electron-updater": "^6.7.3",
+    "handlebars": "^4.7.7",
     "iconv-lite": "^0.7.2",
+    "open": "^9.1.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.64",

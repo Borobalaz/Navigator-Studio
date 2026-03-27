@@ -12,6 +12,10 @@ import { ScriptStatus } from "./components/ScriptStatus";
 import { FolderList } from "./components/FileList/FolderList";
 import { FileInput } from "./components/FileList/FileInput";
 import BugReportIcon from '@mui/icons-material/BugReport';
+import StorageIcon from '@mui/icons-material/Storage';
+import { DatabaseManagerScreen } from "../screens/DatabaseManagerScreen";
+import { DatabaseViewerScreen } from "../screens/DatabaseViewerScreen";
+import { JovedelemIgazolasScreen } from "../screens/JovedelemIgazolasScreen";
 
 export function ViewSelector() {
 
@@ -84,6 +88,35 @@ export function ViewSelector() {
           }
         },
         
+      ]} />
+      <ViewCard key="7" icon={StorageIcon} programLabelProps={[
+        {
+          label: "Adatbázis kezelő", onClick: () => {
+            tabManager.addTab({
+              label: "Adatbázis kezelő",
+              component: DatabaseManagerScreen,
+              props: {}
+            })
+          }
+        },
+        {
+          label: "Adatbázis nézet", onClick: () => {
+            tabManager.addTab({
+              label: "Adatbázis nézet",
+              component: DatabaseViewerScreen,
+              props: {}
+            })
+          }
+        },
+        {
+          label: "Jovedelemigazolas generátor", onClick: () => {
+            tabManager.addTab({
+              label: "Jovedelemigazolas generátor",
+              component: JovedelemIgazolasScreen,
+              props: {}
+            })
+          }
+        },
       ]} />
       <div className="view-selector-settings">
         <ViewCard key="6" icon={SettingsIcon} programLabelProps={[

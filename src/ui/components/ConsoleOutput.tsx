@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import "./ConsoleOutput.css";
 import { stdioManager, StdEntry } from "../../managers/STDIOManager";
-import { Button } from "./Button";
+import { Button } from "./inputs/Button";
 
 export function ConsoleOutput() {
   const [log, setLog] = useState<string>(() => {

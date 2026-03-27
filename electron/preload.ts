@@ -77,6 +77,18 @@ contextBridge.exposeInMainWorld("api", {
   minimize: () => ipcRenderer.invoke("minimize-window"),
   close: () => ipcRenderer.invoke("close-window"),
   openFile: (path: string) => ipcRenderer.invoke("open-file", path),
+
+  selectFolder: (defaultPath?: string) =>
+    ipcRenderer.invoke("select-folder", defaultPath),
+
+  readBinaryFile: async (filePath: string) => {
+    const fullPath = path.resolve(filePath);
+    const buffer = await fs.promises.readFile(fullPath);
+    return Uint8Array.from(buffer);
+  },
+
+  createSchematicPdf: (request: any) =>
+    ipcRenderer.invoke("pdf-create-schematic", request),
 });
 
 contextBridge.exposeInMainWorld("updater", {

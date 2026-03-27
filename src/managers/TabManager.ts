@@ -21,7 +21,11 @@ export class TabManager {
   }
 
   addTab(tab: Tab): void {
-    if(this.tabs.some(t => t.label === tab.label)) return;
+    if(this.tabs.some(t => t.label === tab.label)) {
+      let activeTabLabel = this.tabs.find(t => t.label === tab.label)?.label;
+      this.setActiveTab(activeTabLabel!);
+      return;
+    }
     this.tabs.push(tab);
     this.activeTab = tab;
     this.notify("tabsChange");

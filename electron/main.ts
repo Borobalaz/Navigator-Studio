@@ -1,10 +1,11 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, shell, type OpenDialogOptions } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import iconv from 'iconv-lite'
 import { autoUpdater } from 'electron-updater'
-import fs from 'fs';
+import fs from 'fs'
+import { PdfCreatorService, type PdfGenerationRequest } from './services/PdfCreatorService.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -168,12 +169,44 @@ ipcMain.handle("open-file", async (_event, filePath: string) => {
   return true; // indicate success
 });
 
+ipcMain.handle("select-folder", async (_event, defaultPath?: string) => {
+  const options: OpenDialogOptions = {
+    properties: ["openDirectory", "createDirectory"],
+    defaultPath,
+  };
+
+  const result = win
+    ? await dialog.showOpenDialog(win, options)
+    : await dialog.showOpenDialog(options);
+
+  if (result.canceled || result.filePaths.length === 0) {
+    return null;
+  }
+
+  return result.filePaths[0];
+});
+
 ipcMain.handle("get-public-path", (_, ...segments: string[]) => {
   const basePath = app.isPackaged
     ? path.join(process.resourcesPath, "public")
     : path.join(process.cwd(), "public");
 
   return path.join(basePath, ...segments);
+});
+
+// PDF Creation handler
+ipcMain.handle("pdf-create-schematic", async (_event, request: PdfGenerationRequest) => {
+  try {
+    console.log("PDF creation request received:", { companyId: request.companyId, templateId: request.templateId });
+    const response = await PdfCreatorService.createSchematicPdf(request);
+    return response;
+  } catch (error) {
+    console.error("PDF creation error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "PDF generálás hiba",
+    };
+  }
 });
 
 // Auto-updater configuration
