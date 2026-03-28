@@ -1,85 +1,92 @@
-var u = Object.defineProperty;
-var m = (e, r, n) => r in e ? u(e, r, { enumerable: !0, configurable: !0, writable: !0, value: n }) : e[r] = n;
-var l = (e, r, n) => m(e, typeof r != "symbol" ? r + "" : r, n);
-import { contextBridge as c, ipcRenderer as o } from "electron";
-import i from "fs";
-import s from "path";
-class f {
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+import { contextBridge, ipcRenderer } from "electron";
+import fs from "fs";
+import path from "path";
+class FSManager {
   constructor() {
-    l(this, "listeners", /* @__PURE__ */ new Set());
+    __publicField(this, "listeners", /* @__PURE__ */ new Set());
   }
-  subscribe(r) {
-    return this.listeners.add(r), () => {
-      this.listeners.delete(r);
+  subscribe(cb) {
+    this.listeners.add(cb);
+    return () => {
+      this.listeners.delete(cb);
     };
   }
   emit() {
-    for (const r of this.listeners) r();
+    for (const l of this.listeners) l();
   }
 }
-const p = new f();
-c.exposeInMainWorld("ipcRenderer", {
-  on(...e) {
-    const [r, n] = e;
-    return o.on(r, (t, ...a) => n(t, ...a));
+const fsManager = new FSManager();
+contextBridge.exposeInMainWorld("ipcRenderer", {
+  on(...args) {
+    const [channel, listener] = args;
+    return ipcRenderer.on(channel, (event, ...args2) => listener(event, ...args2));
   },
-  off(...e) {
-    const [r, ...n] = e;
-    return o.off(r, ...n);
+  off(...args) {
+    const [channel, ...omit] = args;
+    return ipcRenderer.off(channel, ...omit);
   },
-  send(...e) {
-    const [r, ...n] = e;
-    return o.send(r, ...n);
+  send(...args) {
+    const [channel, ...omit] = args;
+    return ipcRenderer.send(channel, ...omit);
   },
-  invoke(...e) {
-    const [r, ...n] = e;
-    return o.invoke(r, ...n);
+  invoke(...args) {
+    const [channel, ...omit] = args;
+    return ipcRenderer.invoke(channel, ...omit);
   }
   // You can expose other APTs you need here.
   // ...
 });
-c.exposeInMainWorld("api", {
-  readFolder: async (e) => {
-    const r = s.resolve(e);
+contextBridge.exposeInMainWorld("api", {
+  readFolder: async (relativePath) => {
+    const fullPath = path.resolve(relativePath);
     try {
-      await i.promises.access(r, i.constants.R_OK);
+      await fs.promises.access(fullPath, fs.constants.R_OK);
     } catch {
-      await i.promises.mkdir(r, { recursive: !0 });
+      await fs.promises.mkdir(fullPath, { recursive: true });
     }
-    return (await i.promises.readdir(r, { withFileTypes: !0 })).map((t) => ({
-      name: t.name,
-      isDirectory: t.isDirectory()
+    const dirents = await fs.promises.readdir(fullPath, { withFileTypes: true });
+    return dirents.map((d) => ({
+      name: d.name,
+      isDirectory: d.isDirectory()
     }));
   },
-  getPublicPath: (...e) => o.invoke("get-public-path", ...e),
-  openFolder: async (e) => {
-    const r = s.resolve(e);
-    await o.invoke("open-folder", r);
+  getPublicPath: (...segments) => ipcRenderer.invoke("get-public-path", ...segments),
+  openFolder: async (relativePath) => {
+    const fullPath = path.resolve(relativePath);
+    await ipcRenderer.invoke("open-folder", fullPath);
   },
-  copyFileToFolder: async (e, r) => {
-    const n = s.resolve(e), t = s.join(n, r.name), a = await r.arrayBuffer(), d = Buffer.from(a);
-    await i.promises.writeFile(t, d), p.emit();
+  copyFileToFolder: async (folderPath, file) => {
+    const fullFolderPath = path.resolve(folderPath);
+    const filePath = path.join(fullFolderPath, file.name);
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    await fs.promises.writeFile(filePath, buffer);
+    fsManager.emit();
   },
-  runExe: (e, r) => o.invoke("run-executable", e, r || []),
-  onStdout: (e) => o.on("exe-stdout", (r, n) => e(n)),
-  onStderr: (e) => o.on("exe-stderr", (r, n) => e(n)),
-  removeListener: (e, r) => o.removeListener(e, r),
-  maximize: () => o.invoke("maximize-window"),
-  minimize: () => o.invoke("minimize-window"),
-  close: () => o.invoke("close-window"),
-  openFile: (e) => o.invoke("open-file", e),
-  selectFolder: (e) => o.invoke("select-folder", e),
-  readBinaryFile: async (e) => {
-    const r = s.resolve(e), n = await i.promises.readFile(r);
-    return Uint8Array.from(n);
+  runExe: (exePath, args) => ipcRenderer.invoke("run-executable", exePath, args || []),
+  onStdout: (callback) => ipcRenderer.on("exe-stdout", (_e, data) => callback(data)),
+  onStderr: (callback) => ipcRenderer.on("exe-stderr", (_e, data) => callback(data)),
+  removeListener: (channel, callback) => ipcRenderer.removeListener(channel, callback),
+  maximize: () => ipcRenderer.invoke("maximize-window"),
+  minimize: () => ipcRenderer.invoke("minimize-window"),
+  close: () => ipcRenderer.invoke("close-window"),
+  openFile: (path2) => ipcRenderer.invoke("open-file", path2),
+  selectFolder: (defaultPath) => ipcRenderer.invoke("select-folder", defaultPath),
+  readBinaryFile: async (filePath) => {
+    const fullPath = path.resolve(filePath);
+    const buffer = await fs.promises.readFile(fullPath);
+    return Uint8Array.from(buffer);
   },
-  createSchematicPdf: (e) => o.invoke("pdf-create-schematic", e)
+  createSchematicPdf: (request) => ipcRenderer.invoke("pdf-create-schematic", request)
 });
-c.exposeInMainWorld("updater", {
-  onStatus: (e) => o.on("update-status", (r, n) => e(n)),
-  onProgress: (e) => o.on("update-progress", (r, n) => e(n)),
-  onReady: (e) => o.on("update-ready", () => e()),
-  onError: (e) => o.on("update-error", (r, n) => e(n)),
-  checkForUpdates: () => o.invoke("check-for-updates"),
-  restartAndInstall: () => o.invoke("restart-and-install")
+contextBridge.exposeInMainWorld("updater", {
+  onStatus: (cb) => ipcRenderer.on("update-status", (_, msg) => cb(msg)),
+  onProgress: (cb) => ipcRenderer.on("update-progress", (_, percent) => cb(percent)),
+  onReady: (cb) => ipcRenderer.on("update-ready", () => cb()),
+  onError: (cb) => ipcRenderer.on("update-error", (_, msg) => cb(msg)),
+  checkForUpdates: () => ipcRenderer.invoke("check-for-updates"),
+  restartAndInstall: () => ipcRenderer.invoke("restart-and-install")
 });

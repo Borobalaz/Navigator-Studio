@@ -33,6 +33,12 @@ export {
   teaorKodokRepository,
   tulajdonosokRepository,
 } from './repository';
+export {
+  FEOR_CODES,
+  getFEORName,
+  getAllFEORCodes,
+  searchFEORCodes,
+} from './feor-codes';
 export type {
   BankszamlaRecord,
   CegGfoKapcsolatRecord,

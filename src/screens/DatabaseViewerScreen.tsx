@@ -1,14 +1,12 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import {
   bankszamlaszamokRepository,
-  cegekRepository,
   cegGfoKapcsolatokRepository,
   cegTeaorKapcsolatokRepository,
   cimekRepository,
   kapcsolattartasiAdatokRepository,
   kepviselokRepository,
   kornyezetvedelmiTermekdijTetelekRepository,
-  munkavallalokRepository,
   nyilatkozatokEsAdozasiAdatokRepository,
   tulajdonosokRepository,
   type BankszamlaRecord,
@@ -23,6 +21,8 @@ import {
   type NyilatkozatAdozasiAdatRecord,
   type TulajdonosRecord,
 } from '../db';
+import { useCompanies } from '../hooks/useCompanies';
+import { useEmployees } from '../hooks/useEmployees';
 import './DatabaseViewerScreen.css';
 
 type ExcelLikeRow = {
@@ -243,12 +243,11 @@ function buildEmployeeRows(employees: MunkavallaloRecord[]): ExcelLikeRow[] {
 }
 
 export function DatabaseViewerScreen() {
-  const [companies, setCompanies] = useState<CegRecord[]>([]);
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const { companies, selectedCompanyId, setSelectedCompanyId, error: companiesError } = useCompanies();
+  const { employees, error: employeesError } = useEmployees(selectedCompanyId);
+  const [error, setError] = useState<string>(companiesError || employeesError || '');
   const [viewerMode, setViewerMode] = useState<ViewerMode>('company');
   const [companyData, setCompanyData] = useState<CompanyViewData | null>(null);
-  const [employees, setEmployees] = useState<MunkavallaloRecord[]>([]);
 
   const selectedCompany = useMemo(
     () => companies.find((c) => c['CégAzonosító'] === selectedCompanyId) ?? null,
@@ -271,42 +270,23 @@ export function DatabaseViewerScreen() {
     return buildExcelLikeRows(selectedCompany, companyData);
   }, [selectedCompany, companyData, employees, viewerMode]);
 
-  const loadCompanies = async () => {
-    setError('');
-
-    try {
-      const all = await cegekRepository.listAll();
-      all.sort((a, b) => (a['Megnevezése'] ?? '').localeCompare(b['Megnevezése'] ?? ''));
-      setCompanies(all);
-
-      if (all.length === 0) {
-        setSelectedCompanyId('');
-        setCompanyData(null);
-        setEmployees([]);
-      } else if (!all.some((c) => c['CégAzonosító'] === selectedCompanyId)) {
-        setSelectedCompanyId(all[0]['CégAzonosító']);
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    }
-  };
-
   useEffect(() => {
-    void loadCompanies();
-  }, []);
+    if (companiesError || employeesError) {
+      setError(companiesError || employeesError || '');
+    }
+  }, [companiesError, employeesError]);
 
   useEffect(() => {
     const loadDetails = async () => {
       if (!selectedCompanyId) {
         setCompanyData(null);
-        setEmployees([]);
         return;
       }
 
       setError('');
 
       try {
-        const [cimek, tevekenysegek, gfo, bankszamlak, kepviselok, tulajdonosok, nyilatkozatok, kapcsolatok, termekdijTetelek, companyEmployees] = await Promise.all([
+        const [cimek, tevekenysegek, gfo, bankszamlak, kepviselok, tulajdonosok, nyilatkozatok, kapcsolatok, termekdijTetelek] = await Promise.all([
           cimekRepository.listByCegAzonosito(selectedCompanyId),
           cegTeaorKapcsolatokRepository.listByCegAzonosito(selectedCompanyId),
           cegGfoKapcsolatokRepository.listByCegAzonosito(selectedCompanyId),
@@ -316,10 +296,7 @@ export function DatabaseViewerScreen() {
           nyilatkozatokEsAdozasiAdatokRepository.listByCegAzonosito(selectedCompanyId),
           kapcsolattartasiAdatokRepository.listByCegAzonosito(selectedCompanyId),
           kornyezetvedelmiTermekdijTetelekRepository.listByCegAzonosito(selectedCompanyId),
-          munkavallalokRepository.listByCegAzonosito(selectedCompanyId),
         ]);
-
-        companyEmployees.sort((a, b) => (a['Név'] ?? '').localeCompare(b['Név'] ?? ''));
 
         setCompanyData({
           cimek,
@@ -332,7 +309,6 @@ export function DatabaseViewerScreen() {
           kapcsolatok,
           termekdijTetelek,
         });
-        setEmployees(companyEmployees);
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e));
       }

@@ -2,7 +2,7 @@ import "./PDFSplitterScreen.css";
 import { FolderList } from "../../ui/components/FileList/FolderList";
 import { useState } from "react";
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
-import { usePublicPath } from "../../hooks/UsePublicPathHook";
+import { usePublicPath } from "../../hooks/usePublicPath";
 import { Button } from "../../ui/components/inputs/Button";
 import { fsManager } from "../../managers/FSManager";
 import { ScriptStatus } from "../../ui/components/ScriptStatus";

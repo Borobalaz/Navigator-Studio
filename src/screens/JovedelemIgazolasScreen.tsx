@@ -1,14 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '../ui/components/inputs/Button';
 import { LabeledTextInput } from '../ui/components/inputs/LabeledTextInput';
+import { useCompanies } from '../hooks/useCompanies';
+import { useEmployees } from '../hooks/useEmployees';
 import './JovedelemIgazolasScreen.css';
 
-import {
-  cegekRepository,
-  munkavallalokRepository,
-  type CegRecord,
-  type MunkavallaloRecord,
-} from '../db';
+import { getFEORName, type MunkavallaloRecord } from '../db';
 
 type GenerationResult = {
   success: boolean;
@@ -18,8 +15,6 @@ type GenerationResult = {
 };
 
 type ManualEmploymentInputs = {
-  grossMonthlySalary: string;
-  year: string;
   firstMonth: string;
   secondMonth: string;
   thirdMonth: string;
@@ -43,17 +38,15 @@ function getEmployeeValue(employee: MunkavallaloRecord, keys: string[]): string 
 }
 
 export function JovedelemIgazolasScreen() {
-  const [companies, setCompanies] = useState<CegRecord[]>([]);
-  const [employees, setEmployees] = useState<MunkavallaloRecord[]>([]);
-  const [selectedCompanyId, setSelectedCompanyId] = useState('');
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState('');
+  const { companies, selectedCompanyId, setSelectedCompanyId, error: companiesError } = useCompanies();
+  const { employees, selectedEmployeeId, setSelectedEmployeeId, error: employeesError } = useEmployees(
+    selectedCompanyId,
+  );
   const [outputFolder, setOutputFolder] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(companiesError || employeesError || '');
   const [result, setResult] = useState<GenerationResult | null>(null);
   const [inputs, setInputs] = useState<ManualEmploymentInputs>({
-    grossMonthlySalary: '',
-    year: String(new Date().getFullYear()),
     firstMonth: '',
     secondMonth: '',
     thirdMonth: '',
@@ -61,48 +54,13 @@ export function JovedelemIgazolasScreen() {
     secondMonthNetIncome: '',
     thirdMonthNetIncome: '',
     deductions: '',
-
   });
 
   useEffect(() => {
-    const loadCompanies = async () => {
-      try {
-        const allCompanies = await cegekRepository.listAll();
-        allCompanies.sort((a, b) => (a['Megnevezése'] ?? '').localeCompare(b['Megnevezése'] ?? ''));
-        setCompanies(allCompanies);
-        if (allCompanies.length > 0) {
-          setSelectedCompanyId(allCompanies[0]['CégAzonosító']);
-        }
-      } catch (error) {
-        setErrorMessage(error instanceof Error ? error.message : 'Cégek betöltése sikertelen.');
-      }
-    };
-
-    void loadCompanies();
-  }, []);
-
-  useEffect(() => {
-    const loadEmployees = async () => {
-      if (!selectedCompanyId) {
-        setEmployees([]);
-        setSelectedEmployeeId('');
-        return;
-      }
-
-      try {
-        const records = await munkavallalokRepository.listByCegAzonosito(selectedCompanyId);
-        records.sort((a, b) => (a['Név'] ?? '').localeCompare(b['Név'] ?? ''));
-        setEmployees(records);
-        setSelectedEmployeeId(records[0]?.['MunkavállalóAzonosító'] ?? '');
-      } catch (error) {
-        setErrorMessage(error instanceof Error ? error.message : 'Munkavállalók betöltése sikertelen.');
-        setEmployees([]);
-        setSelectedEmployeeId('');
-      }
-    };
-
-    void loadEmployees();
-  }, [selectedCompanyId]);
+    if (companiesError || employeesError) {
+      setErrorMessage(companiesError || employeesError || '');
+    }
+  }, [companiesError, employeesError]);
 
   const selectedCompany = useMemo(
     () => companies.find((company) => company['CégAzonosító'] === selectedCompanyId) ?? null,
@@ -167,11 +125,10 @@ export function JovedelemIgazolasScreen() {
           activity: selectedCompany['Főtevékenység'] || '',
         },
         employment: {
-          occupation: selectedEmployee['FEOR'] || '',
-          weeklyHours: selectedEmployee['Telj/rész'] === 'Teljes' ? '40' : selectedEmployee['Részidő'] || '',
-          startDate: selectedEmployee['Jogviszony kezdete'] || '',
-          grossMonthlySalary: inputs.grossMonthlySalary,
-          year: inputs.year,
+          occupation: selectedEmployee['FEOR'] + ' - ' + getFEORName(selectedEmployee['FEOR']) || '',
+          weeklyHours: selectedEmployee['Telj/rész'] === 'Telj' ? '40' : selectedEmployee['Részidő'] || '',
+          startDate: selectedEmployee['Jvkezd'] || '',
+          grossMonthlySalary: selectedEmployee['Bes.bér'] || '',
           firstMonth: inputs.firstMonth,
           secondMonth: inputs.secondMonth,
           thirdMonth: inputs.thirdMonth,
@@ -209,8 +166,8 @@ export function JovedelemIgazolasScreen() {
       return;
     }
 
-    if (!inputs.grossMonthlySalary || !inputs.year || !inputs.firstMonth || !inputs.secondMonth || !inputs.thirdMonth || !inputs.firstMonthNetIncome || !inputs.secondMonthNetIncome || !inputs.thirdMonthNetIncome) {
-      setErrorMessage('Töltsd ki a kötelező mezőket: bruttó bér, év, hónapok, havi netto jövedelem.');
+    if (!inputs.firstMonth || !inputs.secondMonth || !inputs.thirdMonth || !inputs.firstMonthNetIncome || !inputs.secondMonthNetIncome || !inputs.thirdMonthNetIncome) {
+      setErrorMessage('Töltsd ki a kötelező mezőket: hónapok, havi nettó jövedelem.');
       return;
     }
 
@@ -284,21 +241,6 @@ export function JovedelemIgazolasScreen() {
             </div>
 
             <div className="jovedelem-input-grid">
-              <LabeledTextInput
-                id="mco-gross-salary"
-                label="Bruttó havi fizetés"
-                value={inputs.grossMonthlySalary}
-                onChange={(value) => setInputValue('grossMonthlySalary', value)}
-                disabled={isLoading}
-              />
-
-              <LabeledTextInput
-                id="mco-year"
-                label="Év"
-                value={inputs.year}
-                onChange={(value) => setInputValue('year', value)}
-                disabled={isLoading}
-              />
 
               <LabeledTextInput
                 id="mco-first-month"

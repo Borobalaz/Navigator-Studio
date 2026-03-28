@@ -2,11 +2,11 @@ import "electron";
 import "node:url";
 import "node:path";
 import "node:child_process";
-import { M as t, R as _, V as a, o as s } from "./main-DJoddnPF.js";
+import { M, R, V, o } from "./main-C-FyRGqC.js";
 import "fs";
 export {
-  t as MAIN_DIST,
-  _ as RENDERER_DIST,
-  a as VITE_DEV_SERVER_URL,
-  s as openFile
+  M as MAIN_DIST,
+  R as RENDERER_DIST,
+  V as VITE_DEV_SERVER_URL,
+  o as openFile
 };

@@ -2,38 +2,24 @@ import { useEffect, useMemo, useState } from 'react';
 import { FileInput } from '../FileList/FileInput';
 import { Button } from '../inputs/Button';
 import {
-  cegekRepository,
   importEmployeesCsvToDb,
-  type CegRecord,
   type EmployeeCsvImportResult,
 } from '../../../db';
+import { useCompanies } from '../../../hooks/useCompanies';
 import '../../../screens/DatabaseManagerScreen.css';
 
 export function EmployeeImporterPanel() {
-  const [companies, setCompanies] = useState<CegRecord[]>([]);
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
+  const { companies, selectedCompanyId, setSelectedCompanyId, error: companiesError } = useCompanies();
   const [selectedCsvPath, setSelectedCsvPath] = useState<string>('');
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [result, setResult] = useState<EmployeeCsvImportResult | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>(companiesError || '');
 
   useEffect(() => {
-    const loadCompanies = async () => {
-      try {
-        const records = await cegekRepository.listAll();
-        records.sort((a, b) => (a['Megnevezése'] ?? '').localeCompare(b['Megnevezése'] ?? ''));
-        setCompanies(records);
-
-        if (records.length > 0) {
-          setSelectedCompanyId(records[0]['CégAzonosító']);
-        }
-      } catch (error) {
-        setErrorMessage(error instanceof Error ? error.message : String(error));
-      }
-    };
-
-    void loadCompanies();
-  }, []);
+    if (companiesError) {
+      setErrorMessage(companiesError);
+    }
+  }, [companiesError]);
 
   const selectedCompany = useMemo(
     () => companies.find((company) => company['CégAzonosító'] === selectedCompanyId) ?? null,

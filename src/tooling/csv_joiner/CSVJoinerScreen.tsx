@@ -1,7 +1,7 @@
 import "./CSVJoinerScreen.css";
 import { FileInput } from "../../ui/components/FileList/FileInput";
 import { FolderList } from "../../ui/components/FileList/FolderList";
-import { usePublicPath } from "../../hooks/UsePublicPathHook";
+import { usePublicPath } from "../../hooks/usePublicPath";
 import { Button } from "../../ui/components/inputs/Button";
 import { useState } from "react";
 import { ScriptStatus } from "../../ui/components/ScriptStatus";
