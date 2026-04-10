@@ -6,7 +6,7 @@ export function AppFooter() {
 
   return (
     <div className="app-footer">
-      Navigator Studio
+      <div> Navigator Studio </div>
       <UpdateBanner />
     </div>
   );
