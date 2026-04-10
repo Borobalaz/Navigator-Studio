@@ -6,6 +6,7 @@ import {
   type EmployeeCsvImportResult,
 } from '../../../db';
 import { useCompanies } from '../../../hooks/useCompanies';
+import { CompanySelector } from '../inputs/CompanySelector';
 import '../../../screens/DatabaseManagerScreen.css';
 
 export function EmployeeImporterPanel() {
@@ -63,20 +64,14 @@ export function EmployeeImporterPanel() {
       <h2>Munkavállalók betöltése</h2>
 
       <div className="database-manager-options">
-        <label>
-          Cég kiválasztása
-          <select
-            value={selectedCompanyId}
-            onChange={(e) => setSelectedCompanyId(e.target.value)}
-          >
-            {companies.length === 0 && <option value="">Nincs cég az adatbázisban</option>}
-            {companies.map((company) => (
-              <option key={company['CégAzonosító']} value={company['CégAzonosító']}>
-                {company['Megnevezése']} ({company['Adószáma']})
-              </option>
-            ))}
-          </select>
-        </label>
+        <CompanySelector
+          id="employee-importer-company-select"
+          label="Cég kiválasztása"
+          companies={companies}
+          value={selectedCompanyId}
+          onChange={setSelectedCompanyId}
+          showTaxNumber
+        />
       </div>
 
       <section className="database-manager-section">

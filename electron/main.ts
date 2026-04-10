@@ -28,6 +28,9 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
 
 let win: BrowserWindow | null
+let isUpdateDownloading = false
+let isUpdateReadyToInstall = false
+let isQuittingForUpdateInstall = false
 
 function createWindow() {
   win = new BrowserWindow({
@@ -53,6 +56,36 @@ function createWindow() {
   } else {
     win.loadFile(path.join(__dirname, "../dist/index.html"));
   }
+
+  win.on('close', async (event) => {
+    if ((!isUpdateDownloading && !isUpdateReadyToInstall) || isQuittingForUpdateInstall) {
+      return
+    }
+
+    event.preventDefault()
+
+    const isDownloadingNow = isUpdateDownloading
+
+    const result = await dialog.showMessageBox(win!, {
+      type: 'question',
+      buttons: isDownloadingNow
+        ? ['Mégse', 'Bezárás és letöltés megszakítása']
+        : ['Mégse', 'Bezárás és frissítés telepítése'],
+      defaultId: 1,
+      cancelId: 0,
+      title: isDownloadingNow ? 'Frissítés letöltése folyamatban' : 'Frissítés telepítése',
+      message: isDownloadingNow ? 'A frissítés jelenleg töltődik.' : 'A frissítés letöltődött.',
+      detail: isDownloadingNow
+        ? 'Ha most bezárod az alkalmazást, a letöltés megszakad. Biztosan be szeretnéd zárni?'
+        : 'Az alkalmazás bezárásakor a frissítés települ. Biztosan be szeretnéd zárni most?',
+      noLink: true,
+    })
+
+    if (result.response === 1) {
+      isQuittingForUpdateInstall = true
+      win?.close()
+    }
+  })
 }
 
 export function openFile(filePath: string) {
@@ -214,11 +247,15 @@ autoUpdater.autoDownload = false; // Don't auto-download, let user control
 autoUpdater.autoInstallOnAppQuit = true; // Install on app quit
 
 autoUpdater.on("checking-for-update", () => {
+  isUpdateDownloading = false
+  isUpdateReadyToInstall = false
   win?.webContents.send("update-status", "Checking for updates...");
   console.log("Checking for updates...");
 });
 
 autoUpdater.on("update-available", () => {
+  isUpdateDownloading = true
+  isUpdateReadyToInstall = false
   win?.webContents.send("update-status", "Update available. Starting download...");
   console.log("Update available, starting download...");
   // Auto-start download once update is available
@@ -226,6 +263,8 @@ autoUpdater.on("update-available", () => {
 });
 
 autoUpdater.on("update-not-available", () => {
+  isUpdateDownloading = false
+  isUpdateReadyToInstall = false
   win?.webContents.send("update-status", "");
   console.log("Already up to date.");
 });
@@ -236,12 +275,16 @@ autoUpdater.on("download-progress", (progress) => {
 });
 
 autoUpdater.on("update-downloaded", () => {
+  isUpdateDownloading = false
+  isUpdateReadyToInstall = true
   win?.webContents.send("update-status", "Update ready. Restart to install.");
   win?.webContents.send("update-ready");
   console.log("Update downloaded and ready to install.");
 });
 
 autoUpdater.on("error", (err) => {
+  isUpdateDownloading = false
+  isUpdateReadyToInstall = false
   win?.webContents.send("update-status", "");
   win?.webContents.send("update-error", err.message);
   console.error("Update error:", err.message);
@@ -259,6 +302,7 @@ ipcMain.handle("check-for-updates", async () => {
 });
 
 ipcMain.handle("restart-and-install", () => {
+  isQuittingForUpdateInstall = true
   autoUpdater.quitAndInstall();
 });
 

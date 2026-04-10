@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '../../ui/components/inputs/Button';
+import { CompanySelector } from '../../ui/components/inputs/CompanySelector';
+import { EmployeeSelector } from '../../ui/components/inputs/EmployeeSelector';
 import { LabeledTextInput } from '../../ui/components/inputs/LabeledTextInput';
 import { useCompanies } from '../../hooks/useCompanies';
 import { useEmployees } from '../../hooks/useEmployees';
+import { getEmployeeValue } from '../../helpers/getEmployeeValue';
+import { formatNumberWithDot } from '../../helpers/formatNumberWithDot';
 import './JovedelemIgazolasScreen.css';
 
-import { getFEORName, type MunkavallaloRecord } from '../../db';
+import { getFEORName } from '../../db';
 
 type GenerationResult = {
   success: boolean;
@@ -24,42 +28,9 @@ type ManualEmploymentInputs = {
   deductions: string;
 };
 
-function getEmployeeValue(employee: MunkavallaloRecord, keys: string[]): string {
-  const row = employee as unknown as Record<string, unknown>;
-
-  for (const key of keys) {
-    const value = row[key];
-    if (typeof value === 'string' && value.trim()) {
-      return value.trim();
-    }
-  }
-
-  return '';
-}
-
-function formatNumberWithDot(value: unknown): string {
-  if (value === null || value === undefined) {
-    return '';
-  }
-
-  const raw = String(value).trim();
-  if (!raw) {
-    return '';
-  }
-
-  const digitsOnly = raw.replace(/\D/g, '');
-  if (!digitsOnly) {
-    return raw;
-  }
-
-  return Number(digitsOnly).toLocaleString('de-DE');
-}
-
 export function JovedelemIgazolasScreen() {
   const { companies, selectedCompanyId, setSelectedCompanyId, error: companiesError } = useCompanies();
-  const { employees, selectedEmployeeId, setSelectedEmployeeId, error: employeesError } = useEmployees(
-    selectedCompanyId,
-  );
+  const { employees, selectedEmployeeId, setSelectedEmployeeId, error: employeesError } = useEmployees(selectedCompanyId);
   const [outputFolder, setOutputFolder] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(companiesError || employeesError || '');
@@ -99,6 +70,13 @@ export function JovedelemIgazolasScreen() {
 
   const setInputValue = (key: keyof ManualEmploymentInputs, value: string) => {
     setInputs((previous) => ({ ...previous, [key]: value }));
+  };
+
+  const setNumberInputValue = (
+    key: 'firstMonthNetIncome' | 'secondMonthNetIncome' | 'thirdMonthNetIncome' | 'deductions',
+    value: string,
+  ) => {
+    setInputValue(key, formatNumberWithDot(value));
   };
 
   const buildPayload = () => {
@@ -223,39 +201,23 @@ export function JovedelemIgazolasScreen() {
         <section className="pdf-creator-section">
           <div className="pdf-creator-options">
             <div className="jovedelem-base-fields">
-              <div>
-                <label htmlFor="mco-company-select">Cég</label>
-                <select
-                  id="mco-company-select"
-                  value={selectedCompanyId}
-                  onChange={(event) => setSelectedCompanyId(event.target.value)}
-                  disabled={isLoading}
-                >
-                  <option value="">-- Válassz céget --</option>
-                  {companies.map((company) => (
-                    <option key={company['CégAzonosító']} value={company['CégAzonosító']}>
-                      {company['Megnevezése']}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <CompanySelector
+                id="mco-company-select"
+                label="Cég"
+                companies={companies}
+                value={selectedCompanyId}
+                onChange={setSelectedCompanyId}
+                disabled={isLoading}
+              />
 
-              <div>
-                <label htmlFor="mco-employee-select">Munkavállaló</label>
-                <select
-                  id="mco-employee-select"
-                  value={selectedEmployeeId}
-                  onChange={(event) => setSelectedEmployeeId(event.target.value)}
-                  disabled={isLoading || !selectedCompanyId}
-                >
-                  <option value="">-- Válassz munkavállalót --</option>
-                  {employees.map((employee) => (
-                    <option key={employee['MunkavállalóAzonosító']} value={employee['MunkavállalóAzonosító']}>
-                      {employee['Név']}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <EmployeeSelector
+                id="mco-employee-select"
+                label="Munkavállaló"
+                employees={employees}
+                value={selectedEmployeeId}
+                onChange={setSelectedEmployeeId}
+                disabled={isLoading || !selectedCompanyId}
+              />
             </div>
 
             <div className="jovedelem-input-grid">
@@ -272,7 +234,7 @@ export function JovedelemIgazolasScreen() {
                 id="mco-first-month-net"
                 label="1. hónap nettó jövedelem"
                 value={inputs.firstMonthNetIncome}
-                onChange={(value) => setInputValue('firstMonthNetIncome', value)}
+                onChange={(value) => setNumberInputValue('firstMonthNetIncome', value)}
                 disabled={isLoading}
               />
 
@@ -288,7 +250,7 @@ export function JovedelemIgazolasScreen() {
                 id="mco-second-month-net"
                 label="2. hónap nettó jövedelem"
                 value={inputs.secondMonthNetIncome}
-                onChange={(value) => setInputValue('secondMonthNetIncome', value)}
+                onChange={(value) => setNumberInputValue('secondMonthNetIncome', value)}
                 disabled={isLoading}
               />
 
@@ -304,7 +266,7 @@ export function JovedelemIgazolasScreen() {
                 id="mco-third-month-net"
                 label="3. hónap nettó jövedelem"
                 value={inputs.thirdMonthNetIncome}
-                onChange={(value) => setInputValue('thirdMonthNetIncome', value)}
+                onChange={(value) => setNumberInputValue('thirdMonthNetIncome', value)}
                 disabled={isLoading}
               />
 
@@ -312,7 +274,7 @@ export function JovedelemIgazolasScreen() {
                 id="mco-deductions"
                 label="Levonások munkabérből"
                 value={inputs.deductions}
-                onChange={(value) => setInputValue('deductions', value)}
+                onChange={(value) => setNumberInputValue('deductions', value)}
                 disabled={isLoading}
               />
 

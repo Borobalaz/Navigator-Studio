@@ -1,11 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '../../ui/components/inputs/Button';
+import { CompanySelector } from '../../ui/components/inputs/CompanySelector';
+import { EmployeeSelector } from '../../ui/components/inputs/EmployeeSelector';
+import { LabeledDropdown } from '../../ui/components/inputs/LabeledDropdown';
 import { LabeledTextInput } from '../../ui/components/inputs/LabeledTextInput';
 import { useCompanies } from '../../hooks/useCompanies';
 import { useEmployees } from '../../hooks/useEmployees';
+import { COMPANY_COURT_OPTIONS } from '../../helpers/companyCourtOptions';
+import { getEmployeeValue } from '../../helpers/getEmployeeValue';
+import { formatNumberWithDot } from '../../helpers/formatNumberWithDot';
 import './MunkaszerzodesCreatorScreen.css';
 
-import { getFEORName, type MunkavallaloRecord } from '../../db';
+import { getFEORName } from '../../db';
 
 type GenerationResult = {
   success: boolean;
@@ -26,24 +32,9 @@ type ManualContractInputs = {
   documentDate: string;
 };
 
-function getEmployeeValue(employee: MunkavallaloRecord, keys: string[]): string {
-  const row = employee as unknown as Record<string, unknown>;
-
-  for (const key of keys) {
-    const value = row[key];
-    if (typeof value === 'string' && value.trim()) {
-      return value.trim();
-    }
-  }
-
-  return '';
-}
-
 export function MunkaszerzodesCreatorScreen() {
   const { companies, selectedCompanyId, setSelectedCompanyId, error: companiesError } = useCompanies();
-  const { employees, selectedEmployeeId, setSelectedEmployeeId, error: employeesError } = useEmployees(
-    selectedCompanyId,
-  );
+  const { employees, selectedEmployeeId, setSelectedEmployeeId, error: employeesError } = useEmployees(selectedCompanyId);
   const [outputFolder, setOutputFolder] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(companiesError || employeesError || '');
@@ -60,6 +51,7 @@ export function MunkaszerzodesCreatorScreen() {
     documentDate: new Date().toISOString().slice(0, 10),
   });
 
+  // Update error message if company or employee loading fails
   useEffect(() => {
     if (companiesError || employeesError) {
       setErrorMessage(companiesError || employeesError || '');
@@ -83,6 +75,7 @@ export function MunkaszerzodesCreatorScreen() {
     }
   };
 
+  // Pre-fill contract fields based on selected employee and company data
   useEffect(() => {
     if (!selectedCompany || !selectedEmployee) {
       return;
@@ -91,9 +84,9 @@ export function MunkaszerzodesCreatorScreen() {
     const defaultJobTitle = selectedEmployee['FEOR']
       ? `${getFEORName(selectedEmployee['FEOR'])}`
       : '';
-    const defaultWeeklyHours = selectedEmployee['Telj/rész'] === 'Telj' ? '40' : selectedEmployee['Részidő'] || '';
+    const defaultWeeklyHours = selectedEmployee['Telj/rész'] === 'Telj' ? '40' : formatNumberWithDot(selectedEmployee['Részidő']);
     const defaultWorkplace = selectedCompany['Székhelycíme'] || '';
-    const defaultSalary = selectedEmployee['Bes.bér'] || '';
+    const defaultSalary = formatNumberWithDot(selectedEmployee['Bes.bér']);
 
     setInputs((previous) => ({
       ...previous,
@@ -107,6 +100,10 @@ export function MunkaszerzodesCreatorScreen() {
 
   const setInputValue = (key: keyof ManualContractInputs, value: string) => {
     setInputs((previous) => ({ ...previous, [key]: value }));
+  };
+
+  const setNumberInputValue = (key: 'trialPeriod' | 'weeklyHours' | 'monthlyGrossSalary', value: string) => {
+    setInputValue(key, formatNumberWithDot(value));
   };
 
   // Create data struct for the template 
@@ -215,49 +212,37 @@ export function MunkaszerzodesCreatorScreen() {
         <section className="pdf-creator-section">
           <div className="pdf-creator-options">
             <div className="munkaszerzodes-base-fields">
-              <div>
-                <label htmlFor="mco-company-select">Cég</label>
-                <select
-                  id="mco-company-select"
-                  value={selectedCompanyId}
-                  onChange={(event) => setSelectedCompanyId(event.target.value)}
-                  disabled={isLoading}
-                >
-                  <option value="">-- Válassz céget --</option>
-                  {companies.map((company) => (
-                    <option key={company['CégAzonosító']} value={company['CégAzonosító']}>
-                      {company['Megnevezése']}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <CompanySelector
+                id="mco-company-select"
+                label="Cég"
+                companies={companies}
+                value={selectedCompanyId}
+                onChange={setSelectedCompanyId}
+                disabled={isLoading}
+              />
 
-              <div>
-                <label htmlFor="mco-employee-select">Munkavállaló</label>
-                <select
-                  id="mco-employee-select"
-                  value={selectedEmployeeId}
-                  onChange={(event) => setSelectedEmployeeId(event.target.value)}
-                  disabled={isLoading || !selectedCompanyId}
-                >
-                  <option value="">-- Válassz munkavállalót --</option>
-                  {employees.map((employee) => (
-                    <option key={employee['MunkavállalóAzonosító']} value={employee['MunkavállalóAzonosító']}>
-                      {employee['Név']}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <EmployeeSelector
+                id="mco-employee-select"
+                label="Munkavállaló"
+                employees={employees}
+                value={selectedEmployeeId}
+                onChange={setSelectedEmployeeId}
+                disabled={isLoading || !selectedCompanyId}
+              />
             </div>
 
             <div className="munkaszerzodes-input-grid">
 
-              <LabeledTextInput
+              <LabeledDropdown
                 id="munkaszerzodes-court"
                 label="Cégjegyzéket vezető bíróság"
                 value={inputs.court}
                 onChange={(value) => setInputValue('court', value)}
                 disabled={isLoading}
+                options={[
+                  { value: '', label: '-- Válassz cégbíróságot --' },
+                  ...COMPANY_COURT_OPTIONS.map((court) => ({ value: court, label: court })),
+                ]}
               />
 
               <LabeledTextInput
@@ -272,7 +257,7 @@ export function MunkaszerzodesCreatorScreen() {
                 id="munkaszerzodes-trial-period"
                 label="Próbaidő (hónap)"
                 value={inputs.trialPeriod}
-                onChange={(value) => setInputValue('trialPeriod', value)}
+                onChange={(value) => setNumberInputValue('trialPeriod', value)}
                 disabled={isLoading}
               />
 
@@ -288,7 +273,7 @@ export function MunkaszerzodesCreatorScreen() {
                 id="munkaszerzodes-weekly-hours"
                 label="Heti munkaidő (óra)"
                 value={inputs.weeklyHours}
-                onChange={(value) => setInputValue('weeklyHours', value)}
+                onChange={(value) => setNumberInputValue('weeklyHours', value)}
                 disabled={isLoading}
               />
 
@@ -296,7 +281,7 @@ export function MunkaszerzodesCreatorScreen() {
                 id="munkaszerzodes-monthly-gross"
                 label="Havi bruttó alapbér"
                 value={inputs.monthlyGrossSalary}
-                onChange={(value) => setInputValue('monthlyGrossSalary', value)}
+                onChange={(value) => setNumberInputValue('monthlyGrossSalary', value)}
                 disabled={isLoading}
               />
 

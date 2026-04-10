@@ -2,7 +2,7 @@ import "electron";
 import "node:url";
 import "node:path";
 import "node:child_process";
-import { M as t, R as _, V as a, o as s } from "./main-DJoddnPF.js";
+import { M as t, R as _, V as a, o as s } from "./main-D14RdXjt.js";
 import "fs";
 export {
   t as MAIN_DIST,

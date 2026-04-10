@@ -3,10 +3,10 @@ import { ViewCard } from './components/ViewCard'
 import ConstructionIcon from '@mui/icons-material/Construction';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { tabManager } from "../managers/TabManager";
-import { PDFSplitterScreen } from "../tooling/pdf_splitter/PDFSplitterScreen";
+import { PDFSplitterScreen } from "../screens/pdf_splitter/PDFSplitterScreen";
 import { globalSettings } from "../settings";
-import { CSVJoinerScreen } from "../tooling/csv_joiner/CSVJoinerScreen";
-import { AutomaticSignerScreen } from "../tooling/automatic_signer/AutomaticSignerScreen";
+import { CSVJoinerScreen } from "../screens/csv_joiner/CSVJoinerScreen";
+import { AutomaticSignerScreen } from "../screens/automatic_signer/AutomaticSignerScreen";
 import { ConsoleOutput } from "./components/ConsoleOutput";
 import { ScriptStatus } from "./components/ScriptStatus";
 import { FolderList } from "./components/FileList/FolderList";
@@ -15,9 +15,9 @@ import BugReportIcon from '@mui/icons-material/BugReport';
 import StorageIcon from '@mui/icons-material/Storage';
 import { DatabaseManagerScreen } from "../screens/DatabaseManagerScreen";
 import { DatabaseViewerScreen } from "../screens/DatabaseViewerScreen";
-import { JovedelemIgazolasScreen } from "../tooling/pdf_generator/JovedelemIgazolasScreen";
+import { JovedelemIgazolasScreen } from "../screens/pdf_generator/JovedelemIgazolasScreen";
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import { MunkaszerzodesCreatorScreen } from "../tooling/pdf_generator/MunkaszerzodesCreatorScreen";
+import { MunkaszerzodesCreatorScreen } from "../screens/pdf_generator/MunkaszerzodesCreatorScreen";
 
 export function ViewSelector() {
 
@@ -113,7 +113,7 @@ export function ViewSelector() {
       ]} />
       <ViewCard key="4" icon={PictureAsPdfIcon} programLabelProps={[
         {
-          label: "Jovedelemigazolas generátor", onClick: () => {
+          label: "Jövedelemigazolás generátor", onClick: () => {
             tabManager.addTab({
               label: "Jovedelemigazolas generátor",
               component: JovedelemIgazolasScreen,

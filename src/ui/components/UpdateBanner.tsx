@@ -30,18 +30,18 @@ export function UpdateBanner() {
     window.updater.restartAndInstall();
   };
 
-  //if (!status && !isReady && !error) {
-  //  return (
-  //    <div className={`update-banner ${status}`}>
-  //      Az alkalmazás naprakész!
-  //    </div>
-  //  );
-  //}
+  if (!status && !isReady && !error) {
+    return (
+      <div className={`update-banner ${status}`}>
+        Az alkalmazás naprakész!
+      </div>
+    );
+  }
 
   if (error) {
     return (
       <div className="update-banner">
-        Update error: {error}
+        Frissítési hiba: {error}
       </div>
     );
   }
@@ -52,7 +52,7 @@ export function UpdateBanner() {
         <button onClick={handleRestart}>
           Újraindítás
         </button>
-        Update ready! Restart now to install.
+        Frissítés kész! Újraindítás a telepítéshez.
       </div>
     );
   }
@@ -71,9 +71,6 @@ export function UpdateBanner() {
             <span>{progress}%</span>
           </div>
         )}
-        <div className="status-text">
-          {status}
-        </div>
       </div>
     );
   }

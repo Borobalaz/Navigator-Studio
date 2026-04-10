@@ -23,6 +23,7 @@ import {
 } from '../db';
 import { useCompanies } from '../hooks/useCompanies';
 import { useEmployees } from '../hooks/useEmployees';
+import { CompanySelector } from '../ui/components/inputs/CompanySelector';
 import './DatabaseViewerScreen.css';
 
 type ExcelLikeRow = {
@@ -320,20 +321,15 @@ export function DatabaseViewerScreen() {
   return (
     <div className="database-viewer-screen">
       <div className="database-viewer-toolbar">
-        <label>
-        Cég választása
-          <select
-            value={selectedCompanyId}
-            onChange={(e) => setSelectedCompanyId(e.target.value)}
-          >
-            {companies.length === 0 && <option value="">Nincs adat</option>}
-            {companies.map((company) => (
-              <option key={company['CégAzonosító']} value={company['CégAzonosító']}>
-                {company['Megnevezése']} ({company['Adószáma']})
-              </option>
-            ))}
-          </select>
-        </label>
+        <CompanySelector
+          id="database-viewer-company-select"
+          label="Cég választása"
+          companies={companies}
+          value={selectedCompanyId}
+          onChange={setSelectedCompanyId}
+          showTaxNumber
+          emptyLabel="Nincs adat"
+        />
         <label>
           Megjelenítés
           <select
