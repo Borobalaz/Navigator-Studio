@@ -319,7 +319,7 @@ export function DatabaseViewerScreen() {
   }, [selectedCompanyId]);
 
   return (
-    <div className="database-viewer-screen">
+    <div className="screen-base database-viewer-screen">
       <div className="database-viewer-toolbar">
         <CompanySelector
           id="database-viewer-company-select"

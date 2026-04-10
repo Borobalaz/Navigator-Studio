@@ -5,7 +5,7 @@ import './DatabaseManagerScreen.css';
 
 export function DatabaseManagerScreen() {
   return (
-    <div className="database-manager-screen">
+    <div className="screen-base database-manager-screen">
       <div className="database-manager-stack">
         <DatabaseImporterPanel />
         <EmployeeImporterPanel />

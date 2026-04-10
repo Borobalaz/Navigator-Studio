@@ -14,7 +14,7 @@ export function PDFSplitterScreen() {
   const [folderPath, _setFolderPath] = usePublicPath("pdf_szetszedo");
 
   return (
-    <div className="pdf-splitter-screen">
+    <div className="screen-base pdf-splitter-screen">
       <ScriptStatus />
       {folderPath && (
         <div className="pdf-splitter-directories-panel">

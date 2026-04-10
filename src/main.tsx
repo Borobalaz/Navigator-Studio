@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './ui/App.tsx'
 import './index.css'
+import './screens/ScreenBase.css'
 
 declare global {
   interface Window {

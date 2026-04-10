@@ -194,7 +194,7 @@ export function JovedelemIgazolasScreen() {
   };
 
   return (
-    <div className="jovedelem-igazolas-screen">
+    <div className="screen-base jovedelem-igazolas-screen">
       <div className="pdf-creator-panel">
         <h2>Jövedelemigazolás</h2>
 

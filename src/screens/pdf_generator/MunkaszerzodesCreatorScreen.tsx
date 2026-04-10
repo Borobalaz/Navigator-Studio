@@ -205,7 +205,7 @@ export function MunkaszerzodesCreatorScreen() {
   };
 
   return (
-    <div className="munkaszerzodes-creator-screen">
+    <div className="screen-base munkaszerzodes-creator-screen">
       <div className="pdf-creator-panel">
         <h2>Munkaszerződés</h2>
 

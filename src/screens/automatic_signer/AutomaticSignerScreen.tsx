@@ -13,7 +13,7 @@ export function AutomaticSignerScreen() {
   const [signatureFilePath, setSignatureFilePath] = useState<string[]>([]);
   const [folderPath, _setFolderPath] = usePublicPath("automatic_signer");
   return (
-    <div className="signer-screen">
+    <div className="screen-base signer-screen">
       <ScriptStatus />
       <div className="signer-controls">
         <FileInput

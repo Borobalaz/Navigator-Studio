@@ -7,7 +7,7 @@ interface HomeScreenProps {
 export function HomeScreen({ text }: HomeScreenProps) {
 
   return (
-    <div className="home-screen">
+    <div className="screen-base home-screen">
       {text}
     </div>
   )

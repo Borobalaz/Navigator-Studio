@@ -11,7 +11,7 @@ export function CSVJoinerScreen() {
   const [excelFilePath, setExcelFilePath] = useState<string[]>([]);
   const [folderPath, _setFolderPath] = usePublicPath("csv_joiner");
   return (
-    <div className="csv-joiner-screen">
+    <div className="screen-base csv-joiner-screen">
       <ScriptStatus />
       <div className="csv-joiner-controls">
         <FileInput

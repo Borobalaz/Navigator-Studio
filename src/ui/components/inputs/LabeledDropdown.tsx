@@ -1,3 +1,5 @@
+import "./InputComponentStyles.css";
+
 type LabeledDropdownOption = {
   value: string;
   label: string;
@@ -21,13 +23,19 @@ export function LabeledDropdown({
   disabled = false,
 }: LabeledDropdownProps) {
   return (
-    <div>
+    <div className="labeled-dropdown">
       <label htmlFor={id}>{label}</label>
       <select
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         disabled={disabled}
+        style={{
+          userSelect: 'text',
+          WebkitUserSelect: 'text',
+          MozUserSelect: 'text',
+          cursor: 'text',
+        }}
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

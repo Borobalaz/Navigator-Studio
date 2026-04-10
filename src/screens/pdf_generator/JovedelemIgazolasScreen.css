@@ -1,7 +1,12 @@
 .jovedelem-igazolas-screen {
   display: flex;
   flex-direction: column;
+  flex: 1;
   width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .jovedelem-igazolas-screen .pdf-creator-panel {
@@ -82,6 +87,7 @@
   background: var(--shade-color);
   color: var(--text-color);
   box-sizing: border-box;
+  width: 100%;
 }
 
 .jovedelem-igazolas-screen .pdf-creator-actions {
