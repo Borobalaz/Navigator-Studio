@@ -15,7 +15,9 @@ import BugReportIcon from '@mui/icons-material/BugReport';
 import StorageIcon from '@mui/icons-material/Storage';
 import { DatabaseManagerScreen } from "../screens/DatabaseManagerScreen";
 import { DatabaseViewerScreen } from "../screens/DatabaseViewerScreen";
-import { JovedelemIgazolasScreen } from "../screens/JovedelemIgazolasScreen";
+import { JovedelemIgazolasScreen } from "../tooling/pdf_generator/JovedelemIgazolasScreen";
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import { MunkaszerzodesCreatorScreen } from "../tooling/pdf_generator/MunkaszerzodesCreatorScreen";
 
 export function ViewSelector() {
 
@@ -64,7 +66,7 @@ export function ViewSelector() {
           label: "ScriptStatus", onClick: () => {
             tabManager.addTab({
               label: "ScriptStatus",
-              component:  ScriptStatus,
+              component: ScriptStatus,
               props: {}
             })
           }
@@ -87,9 +89,9 @@ export function ViewSelector() {
             })
           }
         },
-        
+
       ]} />
-      <ViewCard key="7" icon={StorageIcon} programLabelProps={[
+      <ViewCard key="3" icon={StorageIcon} programLabelProps={[
         {
           label: "Adatbázis kezelő", onClick: () => {
             tabManager.addTab({
@@ -108,6 +110,8 @@ export function ViewSelector() {
             })
           }
         },
+      ]} />
+      <ViewCard key="4" icon={PictureAsPdfIcon} programLabelProps={[
         {
           label: "Jovedelemigazolas generátor", onClick: () => {
             tabManager.addTab({
@@ -117,9 +121,18 @@ export function ViewSelector() {
             })
           }
         },
+        {
+          label: "Munkaszerződés generátor", onClick: () => {
+            tabManager.addTab({
+              label: "Munkaszerződés generátor",
+              component: MunkaszerzodesCreatorScreen,
+              props: {}
+            })
+          }
+        },
       ]} />
       <div className="view-selector-settings">
-        <ViewCard key="6" icon={SettingsIcon} programLabelProps={[
+        <ViewCard key="10" icon={SettingsIcon} programLabelProps={[
           {
             label: "Sötét téma", onClick: () => {
               globalSettings.set("darkMode", !globalSettings.get("darkMode", false));

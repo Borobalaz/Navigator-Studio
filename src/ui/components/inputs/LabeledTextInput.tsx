@@ -4,6 +4,7 @@ type LabeledTextInputProps = {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
+  defaultValue?: string;
 };
 
 export function LabeledTextInput({
@@ -12,6 +13,7 @@ export function LabeledTextInput({
   value,
   onChange,
   disabled = false,
+  defaultValue,
 }: LabeledTextInputProps) {
   return (
     <div>
@@ -22,6 +24,8 @@ export function LabeledTextInput({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         disabled={disabled}
+        defaultValue={defaultValue}
+
       />
     </div>
   );

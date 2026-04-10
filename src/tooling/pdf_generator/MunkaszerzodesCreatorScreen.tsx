@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button } from '../ui/components/inputs/Button';
-import { LabeledTextInput } from '../ui/components/inputs/LabeledTextInput';
-import { useCompanies } from '../hooks/useCompanies';
-import { useEmployees } from '../hooks/useEmployees';
-import './JovedelemIgazolasScreen.css';
+import { Button } from '../../ui/components/inputs/Button';
+import { LabeledTextInput } from '../../ui/components/inputs/LabeledTextInput';
+import { useCompanies } from '../../hooks/useCompanies';
+import { useEmployees } from '../../hooks/useEmployees';
+import './MunkaszerzodesCreatorScreen.css';
 
-import { getFEORName, type MunkavallaloRecord } from '../db';
+import { getFEORName, type MunkavallaloRecord } from '../../db';
 
 type GenerationResult = {
   success: boolean;
@@ -14,14 +14,16 @@ type GenerationResult = {
   error?: string;
 };
 
-type ManualEmploymentInputs = {
-  firstMonth: string;
-  secondMonth: string;
-  thirdMonth: string;
-  firstMonthNetIncome: string;
-  secondMonthNetIncome: string;
-  thirdMonthNetIncome: string;
-  deductions: string;
+type ManualContractInputs = {
+  court: string;
+  startDate: string;
+  trialPeriod: string;
+  jobTitle: string;
+  weeklyHours: string;
+  monthlyGrossSalary: string;
+  workplace: string;
+  documentPlace: string;
+  documentDate: string;
 };
 
 function getEmployeeValue(employee: MunkavallaloRecord, keys: string[]): string {
@@ -37,7 +39,7 @@ function getEmployeeValue(employee: MunkavallaloRecord, keys: string[]): string 
   return '';
 }
 
-export function JovedelemIgazolasScreen() {
+export function MunkaszerzodesCreatorScreen() {
   const { companies, selectedCompanyId, setSelectedCompanyId, error: companiesError } = useCompanies();
   const { employees, selectedEmployeeId, setSelectedEmployeeId, error: employeesError } = useEmployees(
     selectedCompanyId,
@@ -46,14 +48,16 @@ export function JovedelemIgazolasScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(companiesError || employeesError || '');
   const [result, setResult] = useState<GenerationResult | null>(null);
-  const [inputs, setInputs] = useState<ManualEmploymentInputs>({
-    firstMonth: '',
-    secondMonth: '',
-    thirdMonth: '',
-    firstMonthNetIncome: '',
-    secondMonthNetIncome: '',
-    thirdMonthNetIncome: '',
-    deductions: '',
+  const [inputs, setInputs] = useState<ManualContractInputs>({
+    court: '',
+    startDate: '',
+    trialPeriod: '3',
+    jobTitle: '',
+    weeklyHours: '',
+    monthlyGrossSalary: '',
+    workplace: '',
+    documentPlace: 'Kecskemét',
+    documentDate: new Date().toISOString().slice(0, 10),
   });
 
   useEffect(() => {
@@ -79,69 +83,75 @@ export function JovedelemIgazolasScreen() {
     }
   };
 
-  const setInputValue = (key: keyof ManualEmploymentInputs, value: string) => {
+  useEffect(() => {
+    if (!selectedCompany || !selectedEmployee) {
+      return;
+    }
+
+    const defaultJobTitle = selectedEmployee['FEOR']
+      ? `${getFEORName(selectedEmployee['FEOR'])}`
+      : '';
+    const defaultWeeklyHours = selectedEmployee['Telj/rész'] === 'Telj' ? '40' : selectedEmployee['Részidő'] || '';
+    const defaultWorkplace = selectedCompany['Székhelycíme'] || '';
+    const defaultSalary = selectedEmployee['Bes.bér'] || '';
+
+    setInputs((previous) => ({
+      ...previous,
+      startDate: selectedEmployee['Jvkezd'] || previous.startDate,
+      jobTitle: defaultJobTitle || previous.jobTitle,
+      weeklyHours: defaultWeeklyHours || previous.weeklyHours,
+      monthlyGrossSalary: defaultSalary || previous.monthlyGrossSalary,
+      workplace: defaultWorkplace || previous.workplace,
+    }));
+  }, [selectedCompany, selectedEmployee]);
+
+  const setInputValue = (key: keyof ManualContractInputs, value: string) => {
     setInputs((previous) => ({ ...previous, [key]: value }));
   };
 
+  // Create data struct for the template 
   const buildPayload = () => {
     if (!selectedCompany || !selectedEmployee) {
       return null;
     }
 
     const safeEmployeeName = (selectedEmployee['Név'] || 'munkavallalo').replace(/[\\/:*?"<>|]/g, '_');
-    const outputPath = `${outputFolder}\\jovedelemigazolas-mco-${safeEmployeeName}.pdf`;
+    const outputPath = `${outputFolder}\\munkaszerzodes-${safeEmployeeName}.pdf`;
 
     return {
       outputPath,
       payload: {
         employee: {
           name: selectedEmployee['Név'] || '',
-          maidenName: getEmployeeValue(selectedEmployee, ['Szül.név']),
           motherName: getEmployeeValue(selectedEmployee, ['Anyja neve']),
           birthPlaceAndDate: `${getEmployeeValue(selectedEmployee, ['Szül.hely'])}${getEmployeeValue(selectedEmployee, ['Szül.idő']) ? `, ${getEmployeeValue(selectedEmployee, ['Szül.idő'])}` : ''}`,
-          permanentAddress: [
+          address: [
             getEmployeeValue(selectedEmployee, ['Állcím-irsz']),
             getEmployeeValue(selectedEmployee, ['Állcím-hely']),
             getEmployeeValue(selectedEmployee, ['Állcím-utca']),
             getEmployeeValue(selectedEmployee, ['Állcím-jelleg']),
             getEmployeeValue(selectedEmployee, ['Állcím-hsz']),
           ].filter((part) => part).join(' '),
-          temporaryAddress: [
-            getEmployeeValue(selectedEmployee, ['Levcím-irsz']),
-            getEmployeeValue(selectedEmployee, ['Levcím-hely']),
-            getEmployeeValue(selectedEmployee, ['Levcím-utca']),
-            getEmployeeValue(selectedEmployee, ['Levcím-jelleg']),
-            getEmployeeValue(selectedEmployee, ['Levcím-hsz']),
-          ].filter((part) => part).join(' '),
-          taxId: selectedEmployee['Adóazon'] || selectedEmployee['Azonosító'] || '',
-          taj: selectedEmployee['TAJ'] || '',
+          taxId: selectedEmployee['Adóazon'] || '',
+          tajNumber: selectedEmployee['TAJ'] || '',
         },
         employer: {
           name: selectedCompany['Megnevezése'] || '',
+          court: inputs.court,
           registrationNumber: selectedCompany['Cégnyilvántartási száma'] || '',
           registeredOffice: selectedCompany['Székhelycíme'] || '',
-          operationStart: selectedCompany['Tevékenység kezdés dátuma'] || '',
-          taxNumber: selectedCompany['Adószáma'] || '',
-          activity: selectedCompany['Főtevékenység'] || '',
         },
         employment: {
-          occupation: selectedEmployee['FEOR'] + ' - ' + getFEORName(selectedEmployee['FEOR']) || '',
-          weeklyHours: selectedEmployee['Telj/rész'] === 'Telj' ? '40' : selectedEmployee['Részidő'] || '',
-          startDate: selectedEmployee['Jvkezd'] || '',
-          grossMonthlySalary: selectedEmployee['Bes.bér'] || '',
-          firstMonth: inputs.firstMonth,
-          secondMonth: inputs.secondMonth,
-          thirdMonth: inputs.thirdMonth,
-          firstMonthNetIncome: inputs.firstMonthNetIncome,
-          secondMonthNetIncome: inputs.secondMonthNetIncome,
-          thirdMonthNetIncome: inputs.thirdMonthNetIncome,
-          deductions: inputs.deductions,
-          contractType: getEmployeeValue(selectedEmployee, ['Munkaszerződés típusa', 'Munkaszerzodes tipusa']),
+          startDate: inputs.startDate,
+          trialPeriod: inputs.trialPeriod,
+          jobTitle: inputs.jobTitle,
+          weeklyHours: inputs.weeklyHours,
+          monthlyGrossSalary: inputs.monthlyGrossSalary,
+          workplace: inputs.workplace,
         },
         document: {
-          place: 'Budapest',
-          date: new Date().toISOString().slice(0, 10),
-          representative: getEmployeeValue(selectedEmployee, ['Képviselő', 'Kepviselo']),
+          place: inputs.documentPlace,
+          date: inputs.documentDate,
         },
       },
     };
@@ -166,8 +176,8 @@ export function JovedelemIgazolasScreen() {
       return;
     }
 
-    if (!inputs.firstMonth || !inputs.secondMonth || !inputs.thirdMonth || !inputs.firstMonthNetIncome || !inputs.secondMonthNetIncome || !inputs.thirdMonthNetIncome) {
-      setErrorMessage('Töltsd ki a kötelező mezőket: hónapok, havi nettó jövedelem.');
+    if (!inputs.court || !inputs.startDate || !inputs.trialPeriod || !inputs.jobTitle || !inputs.weeklyHours || !inputs.monthlyGrossSalary || !inputs.workplace || !inputs.documentPlace || !inputs.documentDate) {
+      setErrorMessage('Töltsd ki a kötelező mezőket a munkaszerződéshez.');
       return;
     }
 
@@ -181,7 +191,7 @@ export function JovedelemIgazolasScreen() {
     try {
       const response = await window.api.createSchematicPdf({
         companyId: selectedCompanyId,
-        templateId: 'jovedelemigazolas-mco',
+        templateId: 'munkaszerzodes',
         payload: data.payload,
         outputPath: data.outputPath,
         autoOpen: true,
@@ -198,13 +208,13 @@ export function JovedelemIgazolasScreen() {
   };
 
   return (
-    <div className="jovedelem-igazolas-screen">
+    <div className="munkaszerzodes-creator-screen">
       <div className="pdf-creator-panel">
-        <h2>Jövedelemigazolás</h2>
+        <h2>Munkaszerződés</h2>
 
         <section className="pdf-creator-section">
           <div className="pdf-creator-options">
-            <div className="jovedelem-base-fields">
+            <div className="munkaszerzodes-base-fields">
               <div>
                 <label htmlFor="mco-company-select">Cég</label>
                 <select
@@ -240,65 +250,82 @@ export function JovedelemIgazolasScreen() {
               </div>
             </div>
 
-            <div className="jovedelem-input-grid">
+            <div className="munkaszerzodes-input-grid">
 
               <LabeledTextInput
-                id="mco-first-month"
-                label="1. hónap"
-                value={inputs.firstMonth}
-                onChange={(value) => setInputValue('firstMonth', value)}
+                id="munkaszerzodes-court"
+                label="Cégjegyzéket vezető bíróság"
+                value={inputs.court}
+                onChange={(value) => setInputValue('court', value)}
                 disabled={isLoading}
               />
 
               <LabeledTextInput
-                id="mco-first-month-net"
-                label="1. hónap nettó jövedelem"
-                value={inputs.firstMonthNetIncome}
-                onChange={(value) => setInputValue('firstMonthNetIncome', value)}
+                id="munkaszerzodes-start-date"
+                label="Munkaviszony kezdete"
+                value={inputs.startDate}
+                onChange={(value) => setInputValue('startDate', value)}
                 disabled={isLoading}
               />
 
               <LabeledTextInput
-                id="mco-second-month"
-                label="2. hónap"
-                value={inputs.secondMonth}
-                onChange={(value) => setInputValue('secondMonth', value)}
+                id="munkaszerzodes-trial-period"
+                label="Próbaidő (hónap)"
+                value={inputs.trialPeriod}
+                onChange={(value) => setInputValue('trialPeriod', value)}
                 disabled={isLoading}
               />
 
               <LabeledTextInput
-                id="mco-second-month-net"
-                label="2. hónap nettó jövedelem"
-                value={inputs.secondMonthNetIncome}
-                onChange={(value) => setInputValue('secondMonthNetIncome', value)}
+                id="munkaszerzodes-job-title"
+                label="Munkakör"
+                value={inputs.jobTitle}
+                onChange={(value) => setInputValue('jobTitle', value)}
                 disabled={isLoading}
               />
 
               <LabeledTextInput
-                id="mco-third-month"
-                label="3. hónap"
-                value={inputs.thirdMonth}
-                onChange={(value) => setInputValue('thirdMonth', value)}
+                id="munkaszerzodes-weekly-hours"
+                label="Heti munkaidő (óra)"
+                value={inputs.weeklyHours}
+                onChange={(value) => setInputValue('weeklyHours', value)}
                 disabled={isLoading}
               />
 
               <LabeledTextInput
-                id="mco-third-month-net"
-                label="3. hónap nettó jövedelem"
-                value={inputs.thirdMonthNetIncome}
-                onChange={(value) => setInputValue('thirdMonthNetIncome', value)}
+                id="munkaszerzodes-monthly-gross"
+                label="Havi bruttó alapbér"
+                value={inputs.monthlyGrossSalary}
+                onChange={(value) => setInputValue('monthlyGrossSalary', value)}
                 disabled={isLoading}
               />
 
               <LabeledTextInput
-                id="mco-deductions"
-                label="Levonások munkabérből"
-                value={inputs.deductions}
-                onChange={(value) => setInputValue('deductions', value)}
+                id="munkaszerzodes-workplace"
+                label="Munkavégzés helye"
+                value={inputs.workplace}
+                onChange={(value) => setInputValue('workplace', value)}
+                disabled={isLoading}
+                defaultValue={selectedCompany ? selectedCompany['Székhelycíme'] : ''}
+              />
+
+              <LabeledTextInput
+                id="munkaszerzodes-document-place"
+                label="Kelt helye"
+                value={inputs.documentPlace}
+                onChange={(value) => setInputValue('documentPlace', value)}
                 disabled={isLoading}
               />
 
-              <div className="jovedelem-output-row">
+              <LabeledTextInput
+                id="munkaszerzodes-document-date"
+                label="Kelt dátuma (YYYY-MM-DD)"
+                value={inputs.documentDate}
+                onChange={(value) => setInputValue('documentDate', value)}
+                disabled={isLoading}
+              />
+
+              <div className="munkaszerzodes-output-row">
                 <label>Kimeneti mappa</label>
                 <div className="pdf-creator-actions">
                   <Button text="Mappa kiválasztása" onClick={() => void pickOutputFolder()} />

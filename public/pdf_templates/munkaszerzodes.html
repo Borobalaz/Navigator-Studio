@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Munkaszerződés</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11pt;
+      color: #000;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    .sheet {
+      width: 100%;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 18pt;
+      font-weight: 700;
+      margin: 0 0 16px 0;
+    }
+
+    .section {
+      margin-bottom: 20px;
+      page-break-inside: avoid;
+    }
+
+    .section h2 {
+      font-size: 12pt;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      text-transform: none;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 8px;
+      margin-bottom: 4px;
+      align-items: baseline;
+    }
+
+    .label {
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .value {
+      word-break: break-word;
+      border-bottom: 1px dotted #555;
+      min-height: 16px;
+      padding-bottom: 1px;
+    }
+
+    .plain-line {
+      margin: 4px 0;
+    }
+
+    .salary-row {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .salary-row .value {
+      text-align: left;
+      letter-spacing: 0.01em;
+    }
+
+    .declaration {
+      margin-top: 12px;
+      margin-bottom: 28px;
+    }
+
+    .signatures {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 18px;
+      align-items: end;
+    }
+
+    .signature-box {
+      min-height: 52px;
+    }
+
+    .signature-line {
+      border-top: 1px solid #000;
+      text-align: center;
+      padding-top: 4px;
+      font-size: 10pt;
+    }
+
+    .meta {
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sheet">
+    <div class="title">MUNKASZERZŐDÉS</div>
+
+    <section class="section">
+      amely létrejött egyrészről {{employer.name}} (székhely: {{employer.registeredOffice}}, a cégjegyzéket vezető
+      bíróság: {{employer.court}}, cégjegyzék száma: {{employer.registrationNumber}}), mint munkáltató,
+    </section>
+
+    <section class="section">
+      <div>másrészről {{employee.name}}</div>
+      <div>Lakcím: {{employee.address}},</div>
+      <div>született: {{employee.birthPlaceAndDate}},</div>
+      <div>anyja neve: {{employee.motherName}},</div>
+      <div>TAJ szám: {{employee.tajNumber}},</div>
+      <div>Adóazonosító: {{employee.taxId}},</div>
+      <div>mint munkavállaló között, az alábbi feltételekkel:</div>
+    </section>
+
+    <section class="section">
+      <section class="section">
+        1. A munkáltató és a munkavállaló megállapodnak abban, hogy a munkáltató a
+        munkavállalót {{employment.startDate}} napjától kezdődően, határozatlan időtartamú munkajogviszony
+        keretében foglalkoztatja, a jelen munkaszerződésbe foglaltak szerint. A Szerződő Felek
+        megegyeznek abban, hogy a Munkavállaló munkaviszonyának kezdetétől számított {{employment.trialPeriod}}
+        hónap próbaidőnek minősül.
+      </section>
+
+      <section class="section">
+        2. A munkáltató és a munkavállaló megállapodnak abban, hogy a munkavállaló
+        munkaköre: {{employment.jobTitle}}
+      </section>
+
+      <section class="section">
+        A munkáltató és a munkavállaló egybehangzóan kijelentik, hogy a munkáltató a
+        munkaszerződés megkötését megelőzően ismertette a munkavállalóval a munkakörébe
+        tartozó feladatokat. A munkáltató a szerződés megkötésével egyidejűleg átadja a
+        munkavállaló számára a munkaköri leírását.
+      </section>
+
+      <section class="section">
+        3. A munkáltató és a munkavállaló megállapodnak abban, hogy a munkavállaló heti
+        munkaideje {{employment.weeklyHours}} óra, havi bruttó személyi alapbére: {{employment.monthlyGrossSalary}} -
+        Ft.
+      </section>
+
+      <section class="section">
+        4. A munkáltató és a munkavállaló megállapodnak abban, hogy a munkavállaló
+        munkavégzésének helye: {{employment.workplace}}
+      </section>
+
+      <section class="section">
+        5. A munkáltató tájékoztatja a munkavállalót, hogy vele szemben a munkáltatói jogkör
+        gyakorlására az ügyvezető munkakörű (beosztású) vezető jogosult.
+      </section>
+
+      <section class="section">
+        6. A munkavállaló kijelenti, hogy a munkaszerződés megkötésével egyidejűleg a munkáltató
+        tájékoztatta a Munka Törvénykönyv 76. § (7) bekezdésében felsorolt feltételekről.
+      </section>
+
+      <section class="section">
+        7. A jelen megállapodásban nem szabályozott kérdésekben a Munka Törvénykönyve, a
+        kollektív szerződés, és az egyéb munkaviszonyra vonatkozó szabályok rendelkezései az
+        irányadóak.
+      </section>
+    </section>
+
+    <section class="section meta">
+      <div>Kelt: {{document.place}} {{document.date}}</div>
+    </section>
+
+    <section class="signatures" style="margin-top: 75px;">
+      <div class="signature-box">
+        <div class="signature-line">Foglalkoztató</div>
+      </div>
+      <div class="signature-box">
+        <div class="signature-line">Munkavállaló</div>
+      </div>
+    </section>
+  </div>
+</body>
+
+</html>
