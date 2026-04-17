@@ -18,6 +18,10 @@ import { DatabaseViewerScreen } from "../screens/DatabaseViewerScreen";
 import { JovedelemIgazolasScreen } from "../screens/pdf_generator/JovedelemIgazolasScreen";
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { MunkaszerzodesCreatorScreen } from "../screens/pdf_generator/MunkaszerzodesCreatorScreen";
+import { TszFolytScreen } from "../screens/pdf_generator/TszFolytScreen";
+import { TszDontesScreen } from "../screens/pdf_generator/TszDontesScreen";
+import { EszFolytScreen } from "../screens/pdf_generator/EszFolytScreen";
+import { EszDontesScreen } from "../screens/pdf_generator/EszDontesScreen";
 
 export function ViewSelector() {
 
@@ -113,23 +117,60 @@ export function ViewSelector() {
       ]} />
       <ViewCard key="4" icon={PictureAsPdfIcon} programLabelProps={[
         {
-          label: "Jövedelemigazolás generátor", onClick: () => {
+          label: "Jövedelemigazolás", onClick: () => {
             tabManager.addTab({
-              label: "Jovedelemigazolas generátor",
+              label: "Jövedelemigazolás",
               component: JovedelemIgazolasScreen,
               props: {}
             })
           }
         },
         {
-          label: "Munkaszerződés generátor", onClick: () => {
+          label: "Munkaszerződés", onClick: () => {
             tabManager.addTab({
-              label: "Munkaszerződés generátor",
+              label: "Munkaszerződés",
               component: MunkaszerzodesCreatorScreen,
               props: {}
             })
           }
         },
+        {
+          label: "TSZ folyt", onClick: () => {
+            tabManager.addTab({
+              label: "TSZ folyt",
+              component: TszFolytScreen,
+              props: {}
+            })
+          }
+        },
+        {
+          label: "TSZ döntés", onClick: () => {
+            tabManager.addTab({
+              label: "TSZ döntés",
+              component: TszDontesScreen,
+              props: {}
+            })
+          }
+        },
+        {
+          label: "ESZ folyt", onClick: () => {
+            tabManager.addTab({
+              label: "ESZ folyt",
+              component: EszFolytScreen,
+              props: {}
+            })
+          }
+        },
+        {
+          label: "ESZ döntés", onClick: () => {
+            tabManager.addTab({
+              label: "ESZ döntés",
+              component: EszDontesScreen,
+              props: {}
+            })
+          }
+        },
+
       ]} />
       <div className="view-selector-settings">
         <ViewCard key="10" icon={SettingsIcon} programLabelProps={[

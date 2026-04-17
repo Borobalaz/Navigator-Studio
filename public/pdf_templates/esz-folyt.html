@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alapítói határozat</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11pt;
+      color: #000;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    .sheet {
+      width: 100%;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 18pt;
+      font-weight: 700;
+      margin: 0 0 16px 0;
+    }
+
+    .section {
+      margin-bottom: 20px;
+      page-break-inside: avoid;
+    }
+
+    .section h2 {
+      font-size: 12pt;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      text-transform: none;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 8px;
+      margin-bottom: 4px;
+      align-items: baseline;
+    }
+
+    .label {
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .value {
+      word-break: break-word;
+      border-bottom: 1px dotted #555;
+      min-height: 16px;
+      padding-bottom: 1px;
+    }
+
+    .plain-line {
+      margin: 4px 0;
+    }
+
+    .salary-row {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .salary-row .value {
+      text-align: left;
+      letter-spacing: 0.01em;
+    }
+
+    .declaration {
+      margin-top: 12px;
+      margin-bottom: 28px;
+    }
+
+    .signatures {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 18px;
+      align-items: end;
+    }
+
+    .signature-box {
+      min-height: 52px;
+    }
+
+    .signature-line {
+      border-top: 1px solid #000;
+      text-align: center;
+      padding-top: 4px;
+      font-size: 10pt;
+    }
+
+    .meta {
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sheet">
+    <div class="title">Alapítói határozat</div>
+
+    <section class="section">
+      Az egyszerűsített végelszámolási eljárás megszüntetéséről, a tevékenység folytatásáról, amelyet a
+      {{company.court}}
+      Cg. {{company.registrationNumber}} cégjegyzékszám alatt bejegyzett {{company.name}} tagjai hozott:
+    </section>
+
+    <section class="section">
+      1. A tagként elhatároztam a társaság <strong>egyszerűsített végelszámolással</strong> történő, jogutód nélküli
+      megszüntetését. Az azóta felmerült gazdasági helyzet és egyéb körülmények miatt úgy döntöttem, hogy a
+      végelszámolást nem fejezem be, hanem a társaság tevékenységét továbbfolytatom.
+    </section>
+
+    <section class="section">
+      2. A végelszámolás kezdő időpontja: {{document.dissolutionDate}} nap.
+    </section>
+
+    <section class="section">
+      3. Kijelentem, hogy a végelszámolást, mint önálló üzleti évet lezárom, a számviteli törvény és az adótörvények
+      szerinti dokumentumok egyidejű elkészítésével. 
+    </section>
+
+    <section class="section meta">
+      Dátum: {{document.date}}
+    </section>
+
+    <section class="signatures" style="margin-top: 75px;">
+      <div class="signature-box">
+        <div class="signature-line">{{document.dissolverPerson}}</div>
+        <div style="text-align: center; font-size: 10pt;">Alapító</div>
+      </div>
+    </section>
+  </div>
+</body>
+
+</html>

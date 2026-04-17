@@ -9,7 +9,7 @@ import { useEmployees } from '../../hooks/useEmployees';
 import { COMPANY_COURT_OPTIONS } from '../../helpers/companyCourtOptions';
 import { getEmployeeValue } from '../../helpers/getEmployeeValue';
 import { formatNumberWithDot } from '../../helpers/formatNumberWithDot';
-import './MunkaszerzodesCreatorScreen.css';
+import './PdfCreatorCommon.css';
 
 import { getFEORName } from '../../db';
 
@@ -205,13 +205,13 @@ export function MunkaszerzodesCreatorScreen() {
   };
 
   return (
-    <div className="screen-base munkaszerzodes-creator-screen">
+    <div className="screen-base pdf-creator-screen">
       <div className="pdf-creator-panel">
         <h2>Munkaszerződés</h2>
 
         <section className="pdf-creator-section">
           <div className="pdf-creator-options">
-            <div className="munkaszerzodes-base-fields">
+            <div className="pdf-creator-base-fields">
               <CompanySelector
                 id="mco-company-select"
                 label="Cég"
@@ -231,7 +231,7 @@ export function MunkaszerzodesCreatorScreen() {
               />
             </div>
 
-            <div className="munkaszerzodes-input-grid">
+            <div className="pdf-creator-input-grid">
 
               <LabeledDropdown
                 id="munkaszerzodes-court"
@@ -310,7 +310,7 @@ export function MunkaszerzodesCreatorScreen() {
                 disabled={isLoading}
               />
 
-              <div className="munkaszerzodes-output-row">
+              <div className="pdf-creator-output-row">
                 <label>Kimeneti mappa</label>
                 <div className="pdf-creator-actions">
                   <Button text="Mappa kiválasztása" onClick={() => void pickOutputFolder()} />
