@@ -43,6 +43,13 @@ declare global {
       onReady: (cb: () => void) => void;
       onError: (cb: (msg: string) => void) => void;
       checkForUpdates: () => Promise<{ found: boolean }>;
+      getState: () => Promise<{
+        status: string;
+        progress: number;
+        error: string;
+        isReady: boolean;
+        isDownloading: boolean;
+      }>;
       restartAndInstall: () => void;
     };
   }

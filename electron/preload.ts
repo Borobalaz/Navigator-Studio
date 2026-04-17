@@ -107,6 +107,9 @@ contextBridge.exposeInMainWorld("updater", {
   checkForUpdates: () =>
     ipcRenderer.invoke("check-for-updates"),
 
+  getState: () =>
+    ipcRenderer.invoke("get-update-state"),
+
   restartAndInstall: () =>
     ipcRenderer.invoke("restart-and-install"),
 });

@@ -15,6 +15,15 @@ export function UpdateBanner() {
   }, [status]);
 
   useEffect(() => {
+    void window.updater.getState().then((state) => {
+      setStatus(state.status || '');
+      setProgress(state.progress || 0);
+      setError(state.error || '');
+      setIsReady(Boolean(state.isReady));
+    }).catch((err: unknown) => {
+      console.error('Nem sikerült lekérni a frissítés állapotát:', err);
+    });
+
     window.updater.onStatus(setStatus);
     window.updater.onProgress(setProgress);
     window.updater.onError((msg) => {

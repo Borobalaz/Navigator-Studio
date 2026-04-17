@@ -31,6 +31,9 @@ let win: BrowserWindow | null
 let isUpdateDownloading = false
 let isUpdateReadyToInstall = false
 let isQuittingForUpdateInstall = false
+let updateStatusMessage = ''
+let updateProgressPercent = 0
+let updateErrorMessage = ''
 
 function createWindow() {
   win = new BrowserWindow({
@@ -249,14 +252,20 @@ autoUpdater.autoInstallOnAppQuit = true; // Install on app quit
 autoUpdater.on("checking-for-update", () => {
   isUpdateDownloading = false
   isUpdateReadyToInstall = false
-  win?.webContents.send("update-status", "Checking for updates...");
+  updateStatusMessage = 'Checking for updates...'
+  updateProgressPercent = 0
+  updateErrorMessage = ''
+  win?.webContents.send("update-status", updateStatusMessage);
   console.log("Checking for updates...");
 });
 
 autoUpdater.on("update-available", () => {
   isUpdateDownloading = true
   isUpdateReadyToInstall = false
-  win?.webContents.send("update-status", "Update available. Starting download...");
+  updateStatusMessage = 'Update available. Starting download...'
+  updateProgressPercent = 0
+  updateErrorMessage = ''
+  win?.webContents.send("update-status", updateStatusMessage);
   console.log("Update available, starting download...");
   // Auto-start download once update is available
   autoUpdater.downloadUpdate();
@@ -265,19 +274,29 @@ autoUpdater.on("update-available", () => {
 autoUpdater.on("update-not-available", () => {
   isUpdateDownloading = false
   isUpdateReadyToInstall = false
-  win?.webContents.send("update-status", "");
+  updateStatusMessage = ''
+  updateProgressPercent = 0
+  updateErrorMessage = ''
+  win?.webContents.send("update-status", updateStatusMessage);
   console.log("Already up to date.");
 });
 
 autoUpdater.on("download-progress", (progress) => {
-  win?.webContents.send("update-progress", Math.round(progress.percent));
-  console.log(`Download progress: ${Math.round(progress.percent)}%`);
+  updateProgressPercent = Math.round(progress.percent)
+  if (!updateStatusMessage) {
+    updateStatusMessage = 'Update available. Starting download...'
+  }
+  win?.webContents.send("update-status", updateStatusMessage);
+  win?.webContents.send("update-progress", updateProgressPercent);
+  console.log(`Download progress: ${updateProgressPercent}%`);
 });
 
 autoUpdater.on("update-downloaded", () => {
   isUpdateDownloading = false
   isUpdateReadyToInstall = true
-  win?.webContents.send("update-status", "Update ready. Restart to install.");
+  updateStatusMessage = 'Update ready. Restart to install.'
+  updateErrorMessage = ''
+  win?.webContents.send("update-status", updateStatusMessage);
   win?.webContents.send("update-ready");
   console.log("Update downloaded and ready to install.");
 });
@@ -285,9 +304,11 @@ autoUpdater.on("update-downloaded", () => {
 autoUpdater.on("error", (err) => {
   isUpdateDownloading = false
   isUpdateReadyToInstall = false
-  win?.webContents.send("update-status", "");
-  win?.webContents.send("update-error", err.message);
-  console.error("Update error:", err.message);
+  updateStatusMessage = ''
+  updateErrorMessage = err.message
+  win?.webContents.send("update-status", updateStatusMessage);
+  win?.webContents.send("update-error", updateErrorMessage);
+  console.error("Update error:", updateErrorMessage);
 });
 
 // IPC handlers for update control
@@ -299,6 +320,16 @@ ipcMain.handle("check-for-updates", async () => {
     console.error("Error checking for updates:", err);
     throw err;
   }
+});
+
+ipcMain.handle("get-update-state", () => {
+  return {
+    status: updateStatusMessage,
+    progress: updateProgressPercent,
+    error: updateErrorMessage,
+    isReady: isUpdateReadyToInstall,
+    isDownloading: isUpdateDownloading,
+  };
 });
 
 ipcMain.handle("restart-and-install", () => {
