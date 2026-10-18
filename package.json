@@ -42,7 +42,7 @@
   "main": "dist-electron/main.js",
   "build": {
     "directories": {
-      "output": "dist"
+      "output": "release"
     },
     "appId": "com.navigator.studio",
     "files": [

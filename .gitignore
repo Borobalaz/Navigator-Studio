@@ -11,6 +11,7 @@ node_modules
 dist
 dist-electron
 dist-ssr
+release
 *.local
 public/csv_joiner/csvs/*
 public/pdf_splitter/in/24M30/*
