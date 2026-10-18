@@ -300,7 +300,7 @@ autoUpdater.autoInstallOnAppQuit = true; // Install on app quit
 autoUpdater.on("checking-for-update", () => {
   isUpdateDownloading = false
   isUpdateReadyToInstall = false
-  updateStatusMessage = 'Checking for updates...'
+  updateStatusMessage = 'Frissítések keresése...'
   updateProgressPercent = 0
   updateErrorMessage = ''
   win?.webContents.send("update-status", updateStatusMessage);
@@ -310,7 +310,7 @@ autoUpdater.on("checking-for-update", () => {
 autoUpdater.on("update-available", () => {
   isUpdateDownloading = true
   isUpdateReadyToInstall = false
-  updateStatusMessage = 'Update available. Starting download...'
+  updateStatusMessage = 'Frissítés elérhető. Letöltés indítása...'
   updateProgressPercent = 0
   updateErrorMessage = ''
   win?.webContents.send("update-status", updateStatusMessage);
@@ -332,7 +332,7 @@ autoUpdater.on("update-not-available", () => {
 autoUpdater.on("download-progress", (progress) => {
   updateProgressPercent = Math.round(progress.percent)
   if (!updateStatusMessage) {
-    updateStatusMessage = 'Update available. Starting download...'
+    updateStatusMessage = 'Frissítés elérhető. Letöltés indítása...'
   }
   win?.webContents.send("update-status", updateStatusMessage);
   win?.webContents.send("update-progress", updateProgressPercent);
@@ -342,7 +342,7 @@ autoUpdater.on("download-progress", (progress) => {
 autoUpdater.on("update-downloaded", () => {
   isUpdateDownloading = false
   isUpdateReadyToInstall = true
-  updateStatusMessage = 'Update ready. Restart to install.'
+  updateStatusMessage = 'Frissítés kész. Indítsa újra a telepítéshez.'
   updateErrorMessage = ''
   win?.webContents.send("update-status", updateStatusMessage);
   win?.webContents.send("update-ready");

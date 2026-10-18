@@ -109,6 +109,13 @@ export function ViewSelector() {
               globalSettings.set("darkMode", !globalSettings.get("darkMode", false));
             }
           },
+          {
+            label: "Frissítések keresése", onClick: () => {
+              void window.updater.checkForUpdates().catch((err: unknown) => {
+                console.error("Nem sikerült frissítést keresni:", err);
+              });
+            }
+          },
         ]} />
       </div>
     </div>

@@ -80,6 +80,8 @@ export function UpdateBanner() {
             <span>{progress}%</span>
           </div>
         )}
+
+        <div className="status-text">{status}</div>
       </div>
     );
   }
