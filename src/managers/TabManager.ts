@@ -15,7 +15,6 @@ export class TabManager {
     activeTabChange: [] as Listener[],
   };
 
-
   constructor(initialTabs: Tab[] = []) {
     this.tabs = initialTabs;
   }
