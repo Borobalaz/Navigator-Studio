@@ -1,16 +1,18 @@
 .program-label {
   cursor: pointer;
-  background-color: var(--shade-color);
-  border-radius: 5px;
-  padding: 4px 8px;
-  font-size: 15px;
+  background-color: transparent;
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 13.5px;
   color: var(--text-color);
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 4px;
-  transition: background-color 0.2s ease; 
+  white-space: nowrap;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .program-label:hover {
   background-color: var(--secondary-color);
+  color: var(--on-accent-color);
 }

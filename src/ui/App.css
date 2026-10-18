@@ -6,6 +6,8 @@
   height: 100vh;
   box-sizing: border-box;
   overflow: hidden;
+  background: var(--bg-color);
+  color: var(--text-color);
 
   &>.view-selector {
     grid-row: 2;

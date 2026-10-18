@@ -28,12 +28,54 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
 
 let win: BrowserWindow | null
+let splash: BrowserWindow | null
+const SPLASH_MIN_DISPLAY_MS = 900
+let splashShownAt = 0
 let isUpdateDownloading = false
 let isUpdateReadyToInstall = false
 let isQuittingForUpdateInstall = false
 let updateStatusMessage = ''
 let updateProgressPercent = 0
 let updateErrorMessage = ''
+
+function createSplashWindow() {
+  splashShownAt = Date.now()
+
+  splash = new BrowserWindow({
+    width: 420,
+    height: 260,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    movable: true,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    show: false,
+    webPreferences: {
+      sandbox: true,
+    },
+  })
+
+  splash.once('ready-to-show', () => {
+    splash?.show()
+  })
+
+  splash.loadFile(path.join(process.env.VITE_PUBLIC!, 'splash.html'))
+}
+
+function closeSplashWindow() {
+  if (!splash) {
+    return
+  }
+
+  const elapsed = Date.now() - splashShownAt
+  const remaining = Math.max(0, SPLASH_MIN_DISPLAY_MS - elapsed)
+
+  setTimeout(() => {
+    splash?.close()
+    splash = null
+  }, remaining)
+}
 
 function createWindow() {
   win = new BrowserWindow({
@@ -47,6 +89,12 @@ function createWindow() {
     },
     frame: false,
     autoHideMenuBar: false, // ← hides the menu/toolbar
+    show: false,
+  })
+
+  win.once('ready-to-show', () => {
+    closeSplashWindow()
+    win?.show()
   })
 
   // Test active push message to Renderer-process.
@@ -338,6 +386,7 @@ ipcMain.handle("restart-and-install", () => {
 });
 
 app.whenReady().then(() => {
+  createSplashWindow();
   createWindow();
 
   // Check for updates on app start

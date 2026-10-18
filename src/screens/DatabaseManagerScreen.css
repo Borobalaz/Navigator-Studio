@@ -21,8 +21,8 @@
   width: 100%;
   margin: 0 auto;
   background: var(--bg-color);
-  border: 1px solid var(--shade-color);
-  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
   padding: 16px;
   box-sizing: border-box;
 }
@@ -57,14 +57,14 @@
 
 .database-manager-options select {
   padding: 8px;
-  border-radius: 6px;
-  border: 1px solid var(--secondary-color);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
   background: var(--shade-color);
   color: var(--text-color);
 }
 
 .database-manager-section {
-  border-top: 1px solid var(--secondary-color);
+  border-top: 1px solid var(--border-color);
   padding-top: 12px;
   margin-top: 12px;
 }
@@ -83,8 +83,8 @@
 
 .database-manager-input-row input {
   padding: 8px;
-  border-radius: 6px;
-  border: 1px solid var(--secondary-color);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
   background: var(--shade-color);
   color: var(--text-color);
 }
@@ -112,8 +112,8 @@
   gap: 4px;
   margin-top: 10px;
   padding: 10px;
-  border-radius: 6px;
-  border: 1px solid var(--secondary-color);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
   background: var(--shade-color);
   max-height: 240px;
   overflow: auto;
@@ -125,28 +125,28 @@
 }
 
 .database-manager-result li.ok {
-  color: #2b9f46;
+  color: var(--success-color);
 }
 
 .database-manager-result li.fail {
-  color: #d64545;
+  color: var(--danger-color);
 }
 
 .database-manager-error {
   margin-top: 12px;
-  color: #d64545;
+  color: var(--danger-color);
   font-weight: 600;
 }
 
 .database-manager-success {
   margin-top: 12px;
-  color: #2b9f46;
+  color: var(--success-color);
   font-weight: 600;
 }
 
 .database-delete-warning {
   margin: 6px 0 10px;
-  color: #d88f00;
+  color: var(--warning-color);
   font-size: 13px;
 }
 

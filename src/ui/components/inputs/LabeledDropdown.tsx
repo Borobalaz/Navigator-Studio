@@ -30,12 +30,6 @@ export function LabeledDropdown({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         disabled={disabled}
-        style={{
-          userSelect: 'text',
-          WebkitUserSelect: 'text',
-          MozUserSelect: 'text',
-          cursor: 'text',
-        }}
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

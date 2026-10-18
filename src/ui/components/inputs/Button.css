@@ -1,24 +1,30 @@
 .custom-button {
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
   border: none;
   background-color: var(--secondary-color);
   align-self: center;
-  color: var(--text-color);
+  color: var(--on-accent-color);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition: background-color var(--transition-fast), transform 0.1s ease;
   font-family: inherit;
+  white-space: nowrap;
   flex-shrink: 0;
-  max-height: 50px;
-  max-width: 100px;
 }
 
 .custom-button:hover {
   background-color: var(--primary-color);
+  color: #ffffff;
 }
 
 .custom-button:active {
   transform: scale(0.97);
+}
+
+.custom-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
 }

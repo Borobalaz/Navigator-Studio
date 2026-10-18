@@ -3,9 +3,9 @@
   flex-direction: column;
   gap: 8px;
   background-color: var(--shade-color);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   font-family: monospace;
   font-size: 12px;
   color: var(--text-color);
@@ -16,7 +16,7 @@
   width: 100%;
   height: 8px;
   background-color: rgba(100, 100, 100, 0.5);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
@@ -34,25 +34,25 @@
 
 .runtime-exit {
   padding: 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
 }
 
 .runtime-exit-success {
-  background-color: rgba(0, 255, 0, 0.1);
-  border: 1px solid rgba(0, 255, 0, 0.3);
+  background-color: color-mix(in srgb, var(--success-color) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success-color) 40%, transparent);
 }
 
 .runtime-exit-error,
 .runtime-exit-system_error,
 .runtime-exit-validation_error {
-  background-color: rgba(255, 0, 0, 0.1);
-  border: 1px solid rgba(255, 0, 0, 0.3);
+  background-color: color-mix(in srgb, var(--danger-color) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger-color) 40%, transparent);
 }
 
 .runtime-exit-warning {
-  background-color: rgba(255, 165, 0, 0.1);
-  border: 1px solid rgba(255, 165, 0, 0.3);
+  background-color: color-mix(in srgb, var(--warning-color) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warning-color) 40%, transparent);
 }
 
 .runtime-raw-log {
@@ -61,6 +61,6 @@
 }
 
 .runtime-stderr {
-  color: #ff6b6b;
+  color: var(--danger-color);
   word-break: break-word;
 }

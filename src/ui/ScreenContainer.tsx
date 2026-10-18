@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./ScreenContainer.css"
 import { TabCard } from "./components/TabCard";
 import { Tab, tabManager } from "../managers/TabManager";
+import { HomeScreen } from "../screens/HomeScreen";
 
 interface ScreenContainerProps {
   tabs: Tab[]
@@ -22,19 +23,23 @@ export function ScreenContainer({ tabs }: ScreenContainerProps) {
 
   return (
     <div className="screen-container">
-      <div className="screen-tab-list">
-        {tabs.map((tab, index) => (
-          <TabCard
-            key={index}
-            label={tab.label}
-            active={activeTab?.label === tab.label}
-            onClick={() => setActiveTab(tab)}
-            onClose={() => {tabManager.removeTab(tab.label)}}
-          />
-        ))}
-      </div>
+      {tabs.length > 0 && (
+        <div className="screen-tab-list">
+          {tabs.map((tab, index) => (
+            <TabCard
+              key={index}
+              label={tab.label}
+              active={activeTab?.label === tab.label}
+              onClick={() => setActiveTab(tab)}
+              onClose={() => {tabManager.removeTab(tab.label)}}
+            />
+          ))}
+        </div>
+      )}
       <div className="screen-container-screen">
-        {activeTab?.component && React.createElement(activeTab.component, activeTab.props)}
+        {activeTab?.component
+          ? React.createElement(activeTab.component, activeTab.props)
+          : <HomeScreen />}
       </div>
     </div>
   );

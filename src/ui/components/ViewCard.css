@@ -18,21 +18,28 @@
 }
 
 .view-card {
-  width: 100%;
-  aspect-ratio: 1 / 1;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
   cursor: pointer;
   color: var(--text-color-other);
 }
 
 .view-card:hover {
+  color: var(--text-color);
+  background-color: var(--shade-color);
+}
+
+.view-card.active {
   color: var(--secondary-color);
+  background-color: var(--shade-color);
 }
 
 .view-card .MuiSvgIcon-root {
-  height: 30px;
-  font-size: 2rem;
+  height: 20px;
+  font-size: 1.3rem;
 }

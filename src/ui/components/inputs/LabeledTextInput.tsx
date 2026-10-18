@@ -1,3 +1,5 @@
+import "./LabeledTextInput.css";
+
 type LabeledTextInputProps = {
   id: string;
   label: string;
@@ -16,7 +18,7 @@ export function LabeledTextInput({
   defaultValue,
 }: LabeledTextInputProps) {
   return (
-    <div>
+    <div className="labeled-text-input">
       <label htmlFor={id}>{label}</label>
       <input
         id={id}
@@ -25,7 +27,6 @@ export function LabeledTextInput({
         onChange={(event) => onChange(event.target.value)}
         disabled={disabled}
         defaultValue={defaultValue}
-
       />
     </div>
   );

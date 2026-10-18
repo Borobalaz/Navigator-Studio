@@ -1,5 +1,29 @@
 .home-screen {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 6px;
+  height: 100%;
+  color: var(--text-color-other);
+  text-align: center;
+}
+
+.home-screen-logo {
+  width: 56px;
+  height: 56px;
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+
+.home-screen h2 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.home-screen p {
+  margin: 0;
+  font-size: 13px;
 }
