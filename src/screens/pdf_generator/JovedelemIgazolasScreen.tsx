@@ -7,16 +7,11 @@ import { useCompanies } from '../../hooks/useCompanies';
 import { useEmployees } from '../../hooks/useEmployees';
 import { getEmployeeValue } from '../../helpers/getEmployeeValue';
 import { formatNumberWithDot } from '../../helpers/formatNumberWithDot';
+import { usePdfGenerationFlow } from '../../hooks/usePdfGenerationFlow';
+import { PdfResultPanel } from '../../ui/components/PdfResultPanel';
 import './PdfCreatorCommon.css';
 
 import { getFEORName } from '../../db';
-
-type GenerationResult = {
-  success: boolean;
-  outputPath?: string;
-  pageCount?: number;
-  error?: string;
-};
 
 type ManualEmploymentInputs = {
   firstMonth: string;
@@ -31,10 +26,8 @@ type ManualEmploymentInputs = {
 export function JovedelemIgazolasScreen() {
   const { companies, selectedCompanyId, setSelectedCompanyId, error: companiesError } = useCompanies();
   const { employees, selectedEmployeeId, setSelectedEmployeeId, error: employeesError } = useEmployees(selectedCompanyId);
-  const [outputFolder, setOutputFolder] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(companiesError || employeesError || '');
-  const [result, setResult] = useState<GenerationResult | null>(null);
+  const { outputFolder, isLoading, result, errorMessage, setErrorMessage, pickOutputFolder, generate } = usePdfGenerationFlow(companiesError || employeesError || '');
+
   const [inputs, setInputs] = useState<ManualEmploymentInputs>({
     firstMonth: '',
     secondMonth: '',
@@ -49,7 +42,7 @@ export function JovedelemIgazolasScreen() {
     if (companiesError || employeesError) {
       setErrorMessage(companiesError || employeesError || '');
     }
-  }, [companiesError, employeesError]);
+  }, [companiesError, employeesError, setErrorMessage]);
 
   const selectedCompany = useMemo(
     () => companies.find((company) => company['CégAzonosító'] === selectedCompanyId) ?? null,
@@ -60,13 +53,6 @@ export function JovedelemIgazolasScreen() {
     () => employees.find((employee) => employee['MunkavállalóAzonosító'] === selectedEmployeeId) ?? null,
     [employees, selectedEmployeeId],
   );
-
-  const pickOutputFolder = async () => {
-    const folder = await window.api.selectFolder(outputFolder || undefined);
-    if (folder) {
-      setOutputFolder(folder);
-    }
-  };
 
   const setInputValue = (key: keyof ManualEmploymentInputs, value: string) => {
     setInputs((previous) => ({ ...previous, [key]: value }));
@@ -143,55 +129,22 @@ export function JovedelemIgazolasScreen() {
     };
   };
 
-  const handleGeneratePdf = async () => {
-    setErrorMessage('');
-    setResult(null);
-
-    if (!selectedCompanyId) {
-      setErrorMessage('Válassz céget.');
-      return;
-    }
-
+  const validate = () => {
     if (!selectedEmployeeId) {
-      setErrorMessage('Válassz munkavállalót.');
-      return;
+      return 'Válassz munkavállalót.';
     }
-
-    if (!outputFolder) {
-      setErrorMessage('Válassz kimeneti mappát.');
-      return;
-    }
-
     if (!inputs.firstMonth || !inputs.secondMonth || !inputs.thirdMonth || !inputs.firstMonthNetIncome || !inputs.secondMonthNetIncome || !inputs.thirdMonthNetIncome) {
-      setErrorMessage('Töltsd ki a kötelező mezőket: hónapok, havi nettó jövedelem.');
-      return;
+      return 'Töltsd ki a kötelező mezőket: hónapok, havi nettó jövedelem.';
     }
-
-    const data = buildPayload();
-    if (!data) {
-      setErrorMessage('Nincs eleg adat a PDF generalashoz.');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await window.api.createSchematicPdf({
-        companyId: selectedCompanyId,
-        templateId: 'jovedelemigazolas-mco',
-        payload: data.payload,
-        outputPath: data.outputPath,
-        autoOpen: true,
-      });
-      setResult(response);
-    } catch (error) {
-      setResult({
-        success: false,
-        error: error instanceof Error ? error.message : 'Ismeretlen hiba',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    return null;
   };
+
+  const handleGeneratePdf = () => generate({
+    companyId: selectedCompanyId,
+    templateId: 'jovedelemigazolas-mco',
+    buildPayload,
+    validate,
+  });
 
   return (
     <div className="screen-base pdf-creator-screen pdf-creator-screen--scroll pdf-creator-screen--full-width-inputs">
@@ -293,21 +246,7 @@ export function JovedelemIgazolasScreen() {
           </div>
         </section>
 
-        {errorMessage && <div className="pdf-creator-result error"><p>{errorMessage}</p></div>}
-
-        {result && (
-          <div className={`pdf-creator-result ${result.success ? 'success' : 'error'}`}>
-            {result.success ? (
-              <>
-                <p><strong>Sikeres PDF generálás</strong></p>
-                {result.outputPath && <p>Helye: {result.outputPath}</p>}
-                {result.pageCount && <p>Oldalak száma: {result.pageCount}</p>}
-              </>
-            ) : (
-              <p>{result.error || 'Hiba tortent PDF generálás kozben.'}</p>
-            )}
-          </div>
-        )}
+        <PdfResultPanel errorMessage={errorMessage} result={result} />
       </div>
     </div>
   );

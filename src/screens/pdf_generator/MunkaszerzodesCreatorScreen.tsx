@@ -9,16 +9,11 @@ import { useEmployees } from '../../hooks/useEmployees';
 import { COMPANY_COURT_OPTIONS } from '../../helpers/companyCourtOptions';
 import { getEmployeeValue } from '../../helpers/getEmployeeValue';
 import { formatNumberWithDot } from '../../helpers/formatNumberWithDot';
+import { usePdfGenerationFlow } from '../../hooks/usePdfGenerationFlow';
+import { PdfResultPanel } from '../../ui/components/PdfResultPanel';
 import './PdfCreatorCommon.css';
 
 import { getFEORName } from '../../db';
-
-type GenerationResult = {
-  success: boolean;
-  outputPath?: string;
-  pageCount?: number;
-  error?: string;
-};
 
 type ManualContractInputs = {
   court: string;
@@ -35,10 +30,8 @@ type ManualContractInputs = {
 export function MunkaszerzodesCreatorScreen() {
   const { companies, selectedCompanyId, setSelectedCompanyId, error: companiesError } = useCompanies();
   const { employees, selectedEmployeeId, setSelectedEmployeeId, error: employeesError } = useEmployees(selectedCompanyId);
-  const [outputFolder, setOutputFolder] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(companiesError || employeesError || '');
-  const [result, setResult] = useState<GenerationResult | null>(null);
+  const { outputFolder, isLoading, result, errorMessage, setErrorMessage, pickOutputFolder, generate } = usePdfGenerationFlow(companiesError || employeesError || '');
+
   const [inputs, setInputs] = useState<ManualContractInputs>({
     court: '',
     startDate: '',
@@ -56,7 +49,7 @@ export function MunkaszerzodesCreatorScreen() {
     if (companiesError || employeesError) {
       setErrorMessage(companiesError || employeesError || '');
     }
-  }, [companiesError, employeesError]);
+  }, [companiesError, employeesError, setErrorMessage]);
 
   const selectedCompany = useMemo(
     () => companies.find((company) => company['CégAzonosító'] === selectedCompanyId) ?? null,
@@ -67,13 +60,6 @@ export function MunkaszerzodesCreatorScreen() {
     () => employees.find((employee) => employee['MunkavállalóAzonosító'] === selectedEmployeeId) ?? null,
     [employees, selectedEmployeeId],
   );
-
-  const pickOutputFolder = async () => {
-    const folder = await window.api.selectFolder(outputFolder || undefined);
-    if (folder) {
-      setOutputFolder(folder);
-    }
-  };
 
   // Pre-fill contract fields based on selected employee and company data
   useEffect(() => {
@@ -106,7 +92,7 @@ export function MunkaszerzodesCreatorScreen() {
     setInputValue(key, formatNumberWithDot(value));
   };
 
-  // Create data struct for the template 
+  // Create data struct for the template
   const buildPayload = () => {
     if (!selectedCompany || !selectedEmployee) {
       return null;
@@ -154,55 +140,22 @@ export function MunkaszerzodesCreatorScreen() {
     };
   };
 
-  const handleGeneratePdf = async () => {
-    setErrorMessage('');
-    setResult(null);
-
-    if (!selectedCompanyId) {
-      setErrorMessage('Válassz céget.');
-      return;
-    }
-
+  const validate = () => {
     if (!selectedEmployeeId) {
-      setErrorMessage('Válassz munkavállalót.');
-      return;
+      return 'Válassz munkavállalót.';
     }
-
-    if (!outputFolder) {
-      setErrorMessage('Válassz kimeneti mappát.');
-      return;
-    }
-
     if (!inputs.court || !inputs.startDate || !inputs.trialPeriod || !inputs.jobTitle || !inputs.weeklyHours || !inputs.monthlyGrossSalary || !inputs.workplace || !inputs.documentPlace || !inputs.documentDate) {
-      setErrorMessage('Töltsd ki a kötelező mezőket a munkaszerződéshez.');
-      return;
+      return 'Töltsd ki a kötelező mezőket a munkaszerződéshez.';
     }
-
-    const data = buildPayload();
-    if (!data) {
-      setErrorMessage('Nincs eleg adat a PDF generalashoz.');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await window.api.createSchematicPdf({
-        companyId: selectedCompanyId,
-        templateId: 'munkaszerzodes',
-        payload: data.payload,
-        outputPath: data.outputPath,
-        autoOpen: true,
-      });
-      setResult(response);
-    } catch (error) {
-      setResult({
-        success: false,
-        error: error instanceof Error ? error.message : 'Ismeretlen hiba',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    return null;
   };
+
+  const handleGeneratePdf = () => generate({
+    companyId: selectedCompanyId,
+    templateId: 'munkaszerzodes',
+    buildPayload,
+    validate,
+  });
 
   return (
     <div className="screen-base pdf-creator-screen">
@@ -325,21 +278,7 @@ export function MunkaszerzodesCreatorScreen() {
           </div>
         </section>
 
-        {errorMessage && <div className="pdf-creator-result error"><p>{errorMessage}</p></div>}
-
-        {result && (
-          <div className={`pdf-creator-result ${result.success ? 'success' : 'error'}`}>
-            {result.success ? (
-              <>
-                <p><strong>Sikeres PDF generálás</strong></p>
-                {result.outputPath && <p>Helye: {result.outputPath}</p>}
-                {result.pageCount && <p>Oldalak száma: {result.pageCount}</p>}
-              </>
-            ) : (
-              <p>{result.error || 'Hiba tortent PDF generálás kozben.'}</p>
-            )}
-          </div>
-        )}
+        <PdfResultPanel errorMessage={errorMessage} result={result} />
       </div>
     </div>
   );

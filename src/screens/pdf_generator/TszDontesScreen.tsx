@@ -7,13 +7,8 @@ import './PdfCreatorCommon.css';
 import { useCompanies } from '../../hooks/useCompanies';
 import { CompanySelector } from '../../ui/components/inputs/CompanySelector';
 import { useRepresentatives } from '../../hooks/useRepresentatives';
-
-type GenerationResult = {
-  success: boolean;
-  outputPath?: string;
-  pageCount?: number;
-  error?: string;
-};
+import { usePdfGenerationFlow } from '../../hooks/usePdfGenerationFlow';
+import { PdfResultPanel } from '../../ui/components/PdfResultPanel';
 
 type TszDontesInputs = {
   court: string;
@@ -27,10 +22,7 @@ type TszDontesInputs = {
 export function TszDontesScreen() {
   const { companies, selectedCompanyId, setSelectedCompanyId, error: companiesError } = useCompanies();
   const { representatives, isLoading: isRepresentativesLoading, error: representativesError } = useRepresentatives(selectedCompanyId);
-  const [errorMessage, setErrorMessage] = useState(companiesError || '');
-  const [result, setResult] = useState<GenerationResult | null>(null);
-  const [outputFolder, setOutputFolder] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { outputFolder, isLoading, result, errorMessage, setErrorMessage, pickOutputFolder, generate } = usePdfGenerationFlow(companiesError || '');
 
   const [inputs, setInputs] = useState<TszDontesInputs>({
     court: '',
@@ -50,14 +42,7 @@ export function TszDontesScreen() {
     if (companiesError || representativesError) {
       setErrorMessage(companiesError || representativesError || '');
     }
-  }, [companiesError, representativesError]);
-
-  const pickOutputFolder = async () => {
-    const folder = await window.api.selectFolder(outputFolder || undefined);
-    if (folder) {
-      setOutputFolder(folder);
-    }
-  };
+  }, [companiesError, representativesError, setErrorMessage]);
 
   const setInputValue = (key: keyof TszDontesInputs, value: string) => {
     setInputs((previous) => ({ ...previous, [key]: value }));
@@ -90,51 +75,19 @@ export function TszDontesScreen() {
     };
   };
 
-  const handleGeneratePdf = async () => {
-    setErrorMessage('');
-    setResult(null);
-
-    if (!selectedCompanyId) {
-      setErrorMessage('Válassz céget.');
-      return;
-    }
-
-    if (!outputFolder) {
-      setErrorMessage('Válassz kimeneti mappát.');
-      return;
-    }
-
+  const validate = () => {
     if (!inputs.court || !inputs.gatheringDate || !inputs.dissolutionDate || !inputs.documentDate || !inputs.dissolverPerson) {
-      setErrorMessage('Töltsd ki a kötelező mezőket a taggyűlési határozathoz.');
-      return;
+      return 'Töltsd ki a kötelező mezőket a taggyűlési határozathoz.';
     }
-
-    const data = buildPayload();
-    if (!data) {
-      setErrorMessage('Nincs elég adat a PDF generáláshoz.');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const response = await window.api.createSchematicPdf({
-        companyId: selectedCompanyId,
-        templateId: 'tsz-dontes',
-        payload: data.payload,
-        outputPath: data.outputPath,
-        autoOpen: true,
-      });
-      setResult(response);
-    } catch (e) {
-      setResult({
-        success: false,
-        error: e instanceof Error ? e.message : 'Ismeretlen hiba',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    return null;
   };
+
+  const handleGeneratePdf = () => generate({
+    companyId: selectedCompanyId,
+    templateId: 'tsz-dontes',
+    buildPayload,
+    validate,
+  });
 
   return (
     <div className="screen-base pdf-creator-screen">
@@ -227,21 +180,7 @@ export function TszDontesScreen() {
           </div>
         </section>
 
-        {errorMessage && <div className="pdf-creator-result error"><p>{errorMessage}</p></div>}
-
-        {result && (
-          <div className={`pdf-creator-result ${result.success ? 'success' : 'error'}`}>
-            {result.success ? (
-              <>
-                <p><strong>Sikeres PDF generálás</strong></p>
-                {result.outputPath && <p>Helye: {result.outputPath}</p>}
-                {result.pageCount && <p>Oldalak száma: {result.pageCount}</p>}
-              </>
-            ) : (
-              <p>{result.error || 'Hiba történt PDF generálás közben.'}</p>
-            )}
-          </div>
-        )}
+        <PdfResultPanel errorMessage={errorMessage} result={result} />
       </div>
     </div>
   );

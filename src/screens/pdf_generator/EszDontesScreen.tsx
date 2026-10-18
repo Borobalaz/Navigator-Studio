@@ -7,13 +7,8 @@ import './PdfCreatorCommon.css';
 import { useCompanies } from '../../hooks/useCompanies';
 import { CompanySelector } from '../../ui/components/inputs/CompanySelector';
 import { useOwners } from '../../hooks/useOwners';
-
-type GenerationResult = {
-  success: boolean;
-  outputPath?: string;
-  pageCount?: number;
-  error?: string;
-};
+import { usePdfGenerationFlow } from '../../hooks/usePdfGenerationFlow';
+import { PdfResultPanel } from '../../ui/components/PdfResultPanel';
 
 type EszDontesInputs = {
   court: string;
@@ -25,10 +20,7 @@ type EszDontesInputs = {
 export function EszDontesScreen() {
   const { companies, selectedCompanyId, setSelectedCompanyId, error: companiesError } = useCompanies();
   const { owners, isLoading: isOwnersLoading, error: ownersError } = useOwners(selectedCompanyId);
-  const [errorMessage, setErrorMessage] = useState(companiesError || '');
-  const [result, setResult] = useState<GenerationResult | null>(null);
-  const [outputFolder, setOutputFolder] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { outputFolder, isLoading, result, errorMessage, setErrorMessage, pickOutputFolder, generate } = usePdfGenerationFlow(companiesError || '');
 
   const [inputs, setInputs] = useState<EszDontesInputs>({
     court: '',
@@ -46,14 +38,7 @@ export function EszDontesScreen() {
     if (companiesError || ownersError) {
       setErrorMessage(companiesError || ownersError || '');
     }
-  }, [companiesError, ownersError]);
-
-  const pickOutputFolder = async () => {
-    const folder = await window.api.selectFolder(outputFolder || undefined);
-    if (folder) {
-      setOutputFolder(folder);
-    }
-  };
+  }, [companiesError, ownersError, setErrorMessage]);
 
   const setInputValue = (key: keyof EszDontesInputs, value: string) => {
     setInputs((previous) => ({ ...previous, [key]: value }));
@@ -84,51 +69,19 @@ export function EszDontesScreen() {
     };
   };
 
-  const handleGeneratePdf = async () => {
-    setErrorMessage('');
-    setResult(null);
-
-    if (!selectedCompanyId) {
-      setErrorMessage('Válassz céget.');
-      return;
-    }
-
-    if (!outputFolder) {
-      setErrorMessage('Válassz kimeneti mappát.');
-      return;
-    }
-
+  const validate = () => {
     if (!inputs.court || !inputs.dissolutionDate || !inputs.documentDate || !inputs.dissolverPerson) {
-      setErrorMessage('Töltsd ki a kötelező mezőket az alapítói határozathoz.');
-      return;
+      return 'Töltsd ki a kötelező mezőket az alapítói határozathoz.';
     }
-
-    const data = buildPayload();
-    if (!data) {
-      setErrorMessage('Nincs elég adat a PDF generáláshoz.');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const response = await window.api.createSchematicPdf({
-        companyId: selectedCompanyId,
-        templateId: 'esz-dontes',
-        payload: data.payload,
-        outputPath: data.outputPath,
-        autoOpen: true,
-      });
-      setResult(response);
-    } catch (e) {
-      setResult({
-        success: false,
-        error: e instanceof Error ? e.message : 'Ismeretlen hiba',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    return null;
   };
+
+  const handleGeneratePdf = () => generate({
+    companyId: selectedCompanyId,
+    templateId: 'esz-dontes',
+    buildPayload,
+    validate,
+  });
 
   return (
     <div className="screen-base pdf-creator-screen">
@@ -205,21 +158,7 @@ export function EszDontesScreen() {
           </div>
         </section>
 
-        {errorMessage && <div className="pdf-creator-result error"><p>{errorMessage}</p></div>}
-
-        {result && (
-          <div className={`pdf-creator-result ${result.success ? 'success' : 'error'}`}>
-            {result.success ? (
-              <>
-                <p><strong>Sikeres PDF generálás</strong></p>
-                {result.outputPath && <p>Helye: {result.outputPath}</p>}
-                {result.pageCount && <p>Oldalak száma: {result.pageCount}</p>}
-              </>
-            ) : (
-              <p>{result.error || 'Hiba történt PDF generálás közben.'}</p>
-            )}
-          </div>
-        )}
+        <PdfResultPanel errorMessage={errorMessage} result={result} />
       </div>
     </div>
   );

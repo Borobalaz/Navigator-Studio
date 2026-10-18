@@ -22,155 +22,40 @@ import { TszFolytScreen } from "../screens/pdf_generator/TszFolytScreen";
 import { TszDontesScreen } from "../screens/pdf_generator/TszDontesScreen";
 import { EszFolytScreen } from "../screens/pdf_generator/EszFolytScreen";
 import { EszDontesScreen } from "../screens/pdf_generator/EszDontesScreen";
+import type { ComponentType } from "react";
+
+function openTab(label: string, component: ComponentType<any>, props: Record<string, unknown> = {}) {
+  return () => {
+    tabManager.addTab({ label, component, props });
+  };
+}
 
 export function ViewSelector() {
 
   return (
     <div className="view-selector">
       <ViewCard key="1" icon={ConstructionIcon} programLabelProps={[
-        {
-          label: "PDF vágó", onClick: () => {
-            tabManager.addTab({
-              label: "PDF vágó",
-              component: PDFSplitterScreen,
-              props: { text: "PDF vágó" }
-            })
-          }
-        },
-        {
-          label: "CSV összesítő", onClick: () => {
-            tabManager.addTab({
-              label: "CSV összesítő",
-              component: CSVJoinerScreen,
-              props: { text: "CSV összesítő" }
-            })
-          }
-        },
-        {
-          label: "Aláírás", onClick: () => {
-            tabManager.addTab({
-              label: "Aláírás",
-              component: AutomaticSignerScreen,
-              props: { text: "Aláírás" }
-            })
-          }
-        },
+        { label: "PDF vágó", onClick: openTab("PDF vágó", PDFSplitterScreen, { text: "PDF vágó" }) },
+        { label: "CSV összesítő", onClick: openTab("CSV összesítő", CSVJoinerScreen, { text: "CSV összesítő" }) },
+        { label: "Aláírás", onClick: openTab("Aláírás", AutomaticSignerScreen, { text: "Aláírás" }) },
       ]} />
       <ViewCard key="2" icon={BugReportIcon} programLabelProps={[
-        {
-          label: "ConsoleOutput", onClick: () => {
-            tabManager.addTab({
-              label: "ConsoleOutput",
-              component: ConsoleOutput,
-              props: {}
-            })
-          }
-        },
-        {
-          label: "ScriptStatus", onClick: () => {
-            tabManager.addTab({
-              label: "ScriptStatus",
-              component: ScriptStatus,
-              props: {}
-            })
-          }
-        },
-        {
-          label: "FolderList", onClick: () => {
-            tabManager.addTab({
-              label: "FolderList",
-              component: FolderList,
-              props: {}
-            })
-          }
-        },
-        {
-          label: "FileInput", onClick: () => {
-            tabManager.addTab({
-              label: "FileInput",
-              component: FileInput,
-              props: {}
-            })
-          }
-        },
-
+        { label: "ConsoleOutput", onClick: openTab("ConsoleOutput", ConsoleOutput) },
+        { label: "ScriptStatus", onClick: openTab("ScriptStatus", ScriptStatus) },
+        { label: "FolderList", onClick: openTab("FolderList", FolderList) },
+        { label: "FileInput", onClick: openTab("FileInput", FileInput) },
       ]} />
       <ViewCard key="3" icon={StorageIcon} programLabelProps={[
-        {
-          label: "Adatbázis kezelő", onClick: () => {
-            tabManager.addTab({
-              label: "Adatbázis kezelő",
-              component: DatabaseManagerScreen,
-              props: {}
-            })
-          }
-        },
-        {
-          label: "Adatbázis nézet", onClick: () => {
-            tabManager.addTab({
-              label: "Adatbázis nézet",
-              component: DatabaseViewerScreen,
-              props: {}
-            })
-          }
-        },
+        { label: "Adatbázis kezelő", onClick: openTab("Adatbázis kezelő", DatabaseManagerScreen) },
+        { label: "Adatbázis nézet", onClick: openTab("Adatbázis nézet", DatabaseViewerScreen) },
       ]} />
       <ViewCard key="4" icon={PictureAsPdfIcon} programLabelProps={[
-        {
-          label: "Jövedelemigazolás", onClick: () => {
-            tabManager.addTab({
-              label: "Jövedelemigazolás",
-              component: JovedelemIgazolasScreen,
-              props: {}
-            })
-          }
-        },
-        {
-          label: "Munkaszerződés", onClick: () => {
-            tabManager.addTab({
-              label: "Munkaszerződés",
-              component: MunkaszerzodesCreatorScreen,
-              props: {}
-            })
-          }
-        },
-        {
-          label: "TSZ folyt", onClick: () => {
-            tabManager.addTab({
-              label: "TSZ folyt",
-              component: TszFolytScreen,
-              props: {}
-            })
-          }
-        },
-        {
-          label: "TSZ döntés", onClick: () => {
-            tabManager.addTab({
-              label: "TSZ döntés",
-              component: TszDontesScreen,
-              props: {}
-            })
-          }
-        },
-        {
-          label: "ESZ folyt", onClick: () => {
-            tabManager.addTab({
-              label: "ESZ folyt",
-              component: EszFolytScreen,
-              props: {}
-            })
-          }
-        },
-        {
-          label: "ESZ döntés", onClick: () => {
-            tabManager.addTab({
-              label: "ESZ döntés",
-              component: EszDontesScreen,
-              props: {}
-            })
-          }
-        },
-
+        { label: "Jövedelemigazolás", onClick: openTab("Jövedelemigazolás", JovedelemIgazolasScreen) },
+        { label: "Munkaszerződés", onClick: openTab("Munkaszerződés", MunkaszerzodesCreatorScreen) },
+        { label: "TSZ folyt", onClick: openTab("TSZ folyt", TszFolytScreen) },
+        { label: "TSZ döntés", onClick: openTab("TSZ döntés", TszDontesScreen) },
+        { label: "ESZ folyt", onClick: openTab("ESZ folyt", EszFolytScreen) },
+        { label: "ESZ döntés", onClick: openTab("ESZ döntés", EszDontesScreen) },
       ]} />
       <div className="view-selector-settings">
         <ViewCard key="10" icon={SettingsIcon} programLabelProps={[

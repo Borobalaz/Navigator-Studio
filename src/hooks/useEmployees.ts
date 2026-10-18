@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { munkavallalokRepository, type MunkavallaloRecord } from '../db';
+import { useCompanyScopedRecords } from './useCompanyScopedRecords';
 
 interface UseEmployeesResult {
   employees: MunkavallaloRecord[];
@@ -10,44 +10,17 @@ interface UseEmployeesResult {
 }
 
 export function useEmployees(cegAzonosito: string): UseEmployeesResult {
-  const [employees, setEmployees] = useState<MunkavallaloRecord[]>([]);
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>('');
-
-  useEffect(() => {
-    if (!cegAzonosito) {
-      setEmployees([]);
-      setSelectedEmployeeId('');
-      setError('');
-      return;
-    }
-
-    const loadEmployees = async () => {
-      setIsLoading(true);
-      setError('');
-
-      try {
-        const records = await munkavallalokRepository.listByCegAzonosito(cegAzonosito);
-        records.sort((a, b) => (a['Név'] ?? '').localeCompare(b['Név'] ?? ''));
-        setEmployees(records);
-        setSelectedEmployeeId(records[0]?.['MunkavállalóAzonosító'] ?? '');
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Munkavállalók betöltése sikertelen.');
-        setEmployees([]);
-        setSelectedEmployeeId('');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    void loadEmployees();
-  }, [cegAzonosito]);
+  const { records, selectedId, setSelectedId, isLoading, error } = useCompanyScopedRecords(cegAzonosito, {
+    fetchRecords: (id) => munkavallalokRepository.listByCegAzonosito(id),
+    sortKey: (employee) => employee['Név'] ?? '',
+    idKey: (employee) => employee['MunkavállalóAzonosító'] ?? '',
+    errorMessage: 'Munkavállalók betöltése sikertelen.',
+  });
 
   return {
-    employees,
-    selectedEmployeeId,
-    setSelectedEmployeeId,
+    employees: records,
+    selectedEmployeeId: selectedId,
+    setSelectedEmployeeId: setSelectedId,
     isLoading,
     error,
   };

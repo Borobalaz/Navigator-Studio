@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { kepviselokRepository, type KepviseloRecord } from '../db';
+import { useCompanyScopedRecords } from './useCompanyScopedRecords';
 
 interface UseRepresentativesResult {
   representatives: KepviseloRecord[];
@@ -10,44 +10,17 @@ interface UseRepresentativesResult {
 }
 
 export function useRepresentatives(cegAzonosito: string): UseRepresentativesResult {
-  const [representatives, setRepresentatives] = useState<KepviseloRecord[]>([]);
-  const [selectedRepresentativeId, setSelectedRepresentativeId] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>('');
-
-  useEffect(() => {
-    if (!cegAzonosito) {
-      setRepresentatives([]);
-      setSelectedRepresentativeId('');
-      setError('');
-      return;
-    }
-
-    const loadRepresentatives = async () => {
-      setIsLoading(true);
-      setError('');
-
-      try {
-        const records = await kepviselokRepository.listByCegAzonosito(cegAzonosito);
-        records.sort((a, b) => (a['név/elnevezés'] ?? '').localeCompare(b['név/elnevezés'] ?? ''));
-        setRepresentatives(records);
-        setSelectedRepresentativeId(records[0]?.['KépviselőAzonosító'] ?? '');
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Képviselők betöltése sikertelen.');
-        setRepresentatives([]);
-        setSelectedRepresentativeId('');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    void loadRepresentatives();
-  }, [cegAzonosito]);
+  const { records, selectedId, setSelectedId, isLoading, error } = useCompanyScopedRecords(cegAzonosito, {
+    fetchRecords: (id) => kepviselokRepository.listByCegAzonosito(id),
+    sortKey: (representative) => representative['név/elnevezés'] ?? '',
+    idKey: (representative) => representative['KépviselőAzonosító'] ?? '',
+    errorMessage: 'Képviselők betöltése sikertelen.',
+  });
 
   return {
-    representatives,
-    selectedRepresentativeId,
-    setSelectedRepresentativeId,
+    representatives: records,
+    selectedRepresentativeId: selectedId,
+    setSelectedRepresentativeId: setSelectedId,
     isLoading,
     error,
   };

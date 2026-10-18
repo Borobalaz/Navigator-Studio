@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { tulajdonosokRepository, type TulajdonosRecord } from '../db';
+import { useCompanyScopedRecords } from './useCompanyScopedRecords';
 
 interface UseOwnersResult {
   owners: TulajdonosRecord[];
@@ -10,44 +10,17 @@ interface UseOwnersResult {
 }
 
 export function useOwners(cegAzonosito: string): UseOwnersResult {
-  const [owners, setOwners] = useState<TulajdonosRecord[]>([]);
-  const [selectedOwnerId, setSelectedOwnerId] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>('');
-
-  useEffect(() => {
-    if (!cegAzonosito) {
-      setOwners([]);
-      setSelectedOwnerId('');
-      setError('');
-      return;
-    }
-
-    const loadOwners = async () => {
-      setIsLoading(true);
-      setError('');
-
-      try {
-        const records = await tulajdonosokRepository.listByCegAzonosito(cegAzonosito);
-        records.sort((a, b) => (a['Neve'] ?? '').localeCompare(b['Neve'] ?? ''));
-        setOwners(records);
-        setSelectedOwnerId(records[0]?.['TulajdonosAzonosító'] ?? '');
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Tulajdonosok betöltése sikertelen.');
-        setOwners([]);
-        setSelectedOwnerId('');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    void loadOwners();
-  }, [cegAzonosito]);
+  const { records, selectedId, setSelectedId, isLoading, error } = useCompanyScopedRecords(cegAzonosito, {
+    fetchRecords: (id) => tulajdonosokRepository.listByCegAzonosito(id),
+    sortKey: (owner) => owner['Neve'] ?? '',
+    idKey: (owner) => owner['TulajdonosAzonosító'] ?? '',
+    errorMessage: 'Tulajdonosok betöltése sikertelen.',
+  });
 
   return {
-    owners,
-    selectedOwnerId,
-    setSelectedOwnerId,
+    owners: records,
+    selectedOwnerId: selectedId,
+    setSelectedOwnerId: setSelectedId,
     isLoading,
     error,
   };
